@@ -1,13 +1,27 @@
 Package: findBiobankR
-Version: 0.0.0.9000
 Title: Find Biobank R Package
+Version: 0.0.0.9000
+Authors@R: 
+    person("Moses", "Mburu", , "moses.mburu@finddx.org", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-7281-583X"))
 Description: A collection of functions used by Find Biobank team.
-Authors@R: person(given = "Moses",
-       family = "Mburu",
-       role = c("aut", "cre"),
-       email = "moses.mburu@finddx.org",
-       comment = c(ORCID = "0000-0001-7281-583X"))
 License: MIT + file LICENSE
+Depends: 
+    R (>= 2.10)
+Imports: 
+    data.table,
+    janitor,
+    magrittr,
+    purrr,
+    rlang (>= 0.4.11)
+Suggests: 
+    dplyr,
+    knitr,
+    rmarkdown,
+    testthat
+VignetteBuilder: 
+    knitr
 Encoding: UTF-8
+LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

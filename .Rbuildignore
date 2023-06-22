@@ -3,3 +3,7 @@
 ^LICENSE\.md$
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.github$
+^README\.Rmd$
+^data-raw$
+^findBiobankR\.Rproj$

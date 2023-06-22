@@ -1,0 +1,123 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# findBiobankR
+
+<!-- badges: start -->
+
+ [![R-CMD-check](https://github.com/finddx/findBiobankR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/finddx/findBiobankR/actions/workflows/R-CMD-check.yaml)
+
+<!-- badges: end -->
+
+findBiobankR package is a collection of functions regulary used by Find Biobank 
+
+## Installation
+
+You can install the development version of findBiobankR from [GitHub](https://github.com/) with:
+
+``` r
+
+# install.packages("devtools")
+devtools::install_github("finddx/findBiobankR")
+
+```
+
+## Convert Open Specimen Data to wide for Selection 
+
+- The function below is used to prepare clinical and specimen data sets for sample selections 
+
+```{r convert_os_df_to_wide}
+library(findBiobankR)
+library(dplyr)
+library(data.table)
+
+data("tb_data", package = "findBiobankR")
+data("tb_specimen_df", package = "findBiobankR")
+
+# required clinical cols
+clinical_cols <- c("tb_group", "hiv_status", "sex", "country") 
+
+clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
+                                     specimen_df = tb_specimen_df, 
+                                     join_by_col = "ppid",
+                                     specimen_col ="specimen_type" ,
+                                     clinical_vars = clinical_cols ,
+                                     specimen_label_col = "specimen_label",
+                                     os_aliquot_names = c("Serum", "Plasma")
+)
+
+knitr::kable(clin_specs[1:5, ])
+```
+
+
+## Select Specimen
+
+- Using the data set above select aliquot 
+
+```{r}
+##
+samples_list <- list(c("TB0990100010101001", "TB0990100010101002", "TB0990100010101003"),
+                     c("TB0990100020101001", "TB0990100020101002", "TB0990100020101003"), 
+                     c("TB0990100030101001", "TB0990100030101002", "TB0990100030101003"),
+                     c("TB0990100040101001", "TB0990100040101002", "TB0990100040101003"),
+                     c("TB0990100050101001", "TB0990100050101002", "TB0990100050101003"
+                     ))
+# here aliquot number means index or position of the aliquot 
+select_one_aliquot(samples_list,
+                   aliquot_number = 1)
+
+# You can use the data table method to already append this to the data set
+clin_specs[, serum_aliquot_dt := select_one_aliquot(NP_labels_serum)]
+# or tidyverse way
+clin_specs <- clin_specs %>%
+  mutate(serum_aliquot_dp = select_one_aliquot(NP_labels_serum))
+
+knitr::kable(clin_specs[1:5, ])
+```
+
+## Select many aliquots at once
+
+- Let's say a requester wants 2 aliquots per patient. Using the above function it's not convenient
+
+
+```{r}
+##
+clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
+                                     specimen_df = tb_specimen_df, 
+                                     join_by_col = "ppid",
+                                     specimen_col ="specimen_type" ,
+                                     clinical_vars = clinical_cols ,
+                                     specimen_label_col = "specimen_label",
+                                     os_aliquot_names = c("Serum", "Plasma")
+)
+# here aliquots stands for number of samples per patient
+# so this will select firts and second specimen for each participants
+select_many_aliquots(samples_list,
+                   aliquots = 2)
+
+# You can use the data table method to already append this to the data set
+col_nms <- paste0("aliquot", 1:2, "_dt")
+clin_specs[, (col_nms ) := select_many_aliquots(NP_labels_serum, 
+                                                aliquots = 2)]
+
+knitr::kable(head(clin_specs, 5))
+# unfortunately no easy for now tidyverse implementation but trying this below could work
+
+df <- select_many_aliquots(clin_specs$NP_labels_serum, aliquots = 2) %>% 
+  as.data.frame()
+# You can then bind cols to the original data
+knitr::kable(head(df, 2))
+```
+
