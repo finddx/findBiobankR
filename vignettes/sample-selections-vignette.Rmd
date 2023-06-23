@@ -1,5 +1,5 @@
 ---
-title: "Sample Selections Vignette"
+title: "sample-selections-vignette"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{sample-selections-vignette}

@@ -2,8 +2,7 @@
 % Please edit documentation in R/convert_os_df_to_wide.R
 \name{convert_os_df_to_wide}
 \alias{convert_os_df_to_wide}
-\title{Title Convert  OS data to wide
-Description Convert OS data to wide and merge with clinical data}
+\title{Convert  OS data to wide}
 \usage{
 convert_os_df_to_wide(
   clinical_df,
@@ -44,8 +43,7 @@ each aliquot name and the number of aliquots and the specimen labels for
 that aliquot.
 }
 \description{
-Title Convert  OS data to wide
-Description Convert OS data to wide and merge with clinical data
+Convert OS data to wide and merge with clinical data
 }
 \examples{
 library(data.table)

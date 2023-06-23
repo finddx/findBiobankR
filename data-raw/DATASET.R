@@ -133,3 +133,31 @@ idcols_all <- c("ppid",id_cols)
 tb_df_clin <- tb_df[, ..idcols_all] |>
     unique(by = idcols_all)
 
+dir.create("inst/extdata")
+
+data("iris")
+
+write.csv(iris, file = "inst/extdata/iris.csv")
+
+iris_split <- split(iris, f = iris$Species)
+library(data.table)
+
+create_save_workbook <- function(list_of_dfs, path_name, sheet_names ){
+
+    library(openxlsx)
+
+    wb <- createWorkbook()
+
+    for ( i in seq_along(sheet_names)) {
+        df = list_of_dfs[[i]]
+        sheet_i = sheet_names[i]
+        setDF(df)
+        addWorksheet(wb, sheet_i)
+        writeData(wb, sheet_i , df, startCol = 1)
+    }
+    saveWorkbook(wb, file = path_name)
+}
+
+create_save_workbook(list_of_dfs =iris_split,
+                     path_name = "inst/extdata/iris_species.xlsx",
+                     sheet_names = names(iris_split))

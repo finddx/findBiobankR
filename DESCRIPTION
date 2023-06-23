@@ -10,10 +10,13 @@ Depends:
     R (>= 2.10)
 Imports: 
     data.table,
+    DT,
     janitor,
     magrittr,
     purrr,
-    rlang (>= 0.4.11)
+    readxl,
+    rlang (>= 0.4.11),
+    tools
 Suggests: 
     dplyr,
     knitr,
