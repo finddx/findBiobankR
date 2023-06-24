@@ -1,0 +1,202 @@
+---
+title: "flat_my_fun.Rmd empty"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r development, include=FALSE}
+library(testthat)
+```
+
+<!--
+ You need to run the 'description' chunk in the '0-dev_history.Rmd' file before continuing your code there.
+-->
+
+```{r development-load}
+# Load already included functions if relevant
+pkgload::load_all(export_all = FALSE)
+```
+
+# data_table
+    
+```{r function-data_table}
+#' data_table function
+#'
+#' This function creates a datatable from a data frame using the DT package.
+#'
+#' @param df The data frame to be displayed as a datatable.
+#' @param pageLength The number of rows to display per page. Default is 50.
+#' @param row_names Logical value indicating whether to display row names. Default is FALSE.
+#' @param file_name The name of the file to be used for exporting data. 
+#' @importFrom DT datatable
+#' @return An interactive data table of class DT
+#' @export
+data_table <- function(df, pageLength = 50, 
+                       row_names = FALSE,
+                       file_name = "output_file") {
+    
+    stopifnot("Data frame must be provide"=!missing(df))
+    
+    if(isFALSE(inherits(df, "data.frame"))){
+        stop("df must be a data.frame")
+    }
+    
+
+    n_col <- ncol(df) - 1
+    datatable(df,
+              rownames = row_names,
+              extensions = 'Buttons',
+              #style = "bootstrap4",
+              #class = 'cell-border stripe',
+              options = list(
+                  scrollX = TRUE,
+                  pageLength = pageLength,
+                  dom = 'Blfrtip',
+                  buttons = list(
+                      list(extend = 'copy', filename = file_name),
+                      list(extend = 'csv', filename = file_name),
+                      list(extend = 'excel', filename = file_name),
+                      list(extend = 'pdf', filename = file_name)
+                  ),
+                  columnDefs = list(
+                      list(className = 'dt-center', targets = 0:n_col)
+                  )
+              )
+    )
+}
+
+```
+  
+  
+```{r example-data_table}
+ data("iris")
+df = iris[1:10,]
+
+data_table(df, 
+           file_name = "iris_sub_df")
+```
+ 
+  
+```{r tests-data_table}
+test_that("data_table displays datatable correctly", {
+  df <- iris[1:10,]
+  output <- data_table(df, pageLength = 10, file_name = "")
+  
+  # Test if the output contains expected elements
+  expect_true(inherits(output, "datatables"))
+  
+  expect_error(data_table(df = c(1,2,3)),
+               regexp ="df must be a data.frame")
+
+})
+
+```
+  
+# read_multiple_sheets
+    
+```{r function-read_multiple_sheets}
+#' Read Sheets  From excel workbook
+#' 
+#' Read Files From excel workbook 
+#' 
+#' @param file_path path to file  
+#' @return returns a list of data frames 
+#' @importFrom readxl read_excel excel_sheets
+#' @importFrom purrr  set_names possibly
+#' @importFrom tools file_ext
+#' @importFrom janitor make_clean_names
+#' @return A list of data frames 
+#' 
+#' @export
+#'
+read_multiple_sheets <- function(file_path){
+    
+    
+    if(isFALSE(file.exists(file_path))) {
+        
+        stop("The file provided doesn't exists, Check path")
+    } 
+    
+    file_extension = file_ext(file_path)
+    
+    if(file_extension != "xlsx"){
+        
+        stop("The extension of the file is not an excel file")
+        
+    }
+    
+    xl_sheets <- excel_sheets(file_path)
+    
+    xl_sheets_clean <- make_clean_names(xl_sheets)
+    
+    possi_excel <- possibly(read_excel, otherwise = NULL)
+    
+    list_of_files <- lapply(xl_sheets, function(x){
+        
+        possi_excel(file_path, sheet = x)
+        
+    })  %>% 
+        set_names(xl_sheets_clean)
+    
+    list_of_files
+    
+}
+```
+  
+```{r example-read_multiple_sheets}
+iris_species <- system.file("extdata", "iris_species.xlsx",
+                          package = "findBiobankR")
+
+iris_list <- read_multiple_sheets(file_path  = iris_species ) %>% 
+  lapply(head, 4)
+iris_list
+```
+  
+```{r tests-read_multiple_sheets}
+# Test if the function throws an error when the file doesn't exist
+test_that("Error is thrown when file doesn't exist", {
+    expect_error(read_multiple_sheets("non_existent_file.xlsx"), 
+                 "The file provided doesn't exists, Check path")
+})
+
+# Test if the function throws an error when the file extension is not xlsx
+
+test_that("Error is thrown when file extension is not xlsx", {
+    
+    iris_df_path <- system.file("extdata", "iris.csv",
+                           package = "findBiobankR")
+    
+    expect_error(read_multiple_sheets(iris_df_path), 
+                 "The extension of the file is not an excel file")
+    
+    
+})
+
+
+# Test if the function returns a list of data frames when a valid xlsx file is provided and 
+test_that("Returns a list of data frames for a valid xlsx file", {
+    iris_species <- system.file("extdata", "iris_species.xlsx",
+                          package = "findBiobankR")
+
+    iris_list <- read_multiple_sheets(file_path  = iris_species )
+    
+  
+    expect_true(is.list(iris_list))
+    expect_true(all(sapply(iris_list, is.data.frame)))
+    
+    expect_equal(names(iris_list),c("setosa", "versicolor", "virginica"))
+})
+
+
+
+
+```
+  
+
+```{r development-inflate, eval=FALSE}
+# Run but keep eval=FALSE to avoid infinite loop
+# Execute in the console directly
+fusen::inflate(flat_file = "dev/biobank_reports.Rmd",
+               vignette_name = "biobank-reports")
+```

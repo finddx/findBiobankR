@@ -9,8 +9,7 @@
 
 <!-- badges: end -->
 
-findBiobankR package is a collection of functions regulary used by Find
-Biobank
+findBiobankR package is a collection of functions used by FindDx Biobank
 
 ## Installation
 

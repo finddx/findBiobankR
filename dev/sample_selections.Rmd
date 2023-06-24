@@ -19,10 +19,10 @@ You need to run the 'description' chunk in the '0-dev_history.Rmd' file before c
 ```{r function-convert_os_df_to_wide }
 
 
-# convert to wide first then merge
 
-#' Title Convert  OS data to wide
-#' Description Convert OS data to wide and merge with clinical data
+#' Convert  OS data to wide
+#' 
+#' Convert OS data to wide and merge with clinical data
 #' 
 #' @param clinical_df A data frame with clinical data at Find typically from Open Clinica.
 #' @param specimen_df A data frame with specimen data at Find generally Open Specimen.
@@ -424,7 +424,7 @@ pkgload::load_all(export_all = FALSE)
   # Run but keep eval=FALSE to avoid infinite loop
   # Execute in the console directly
 fusen::inflate(flat_file = "dev/sample_selections.Rmd",
-               vignette_name = "Sample Selections Vignette")
+               vignette_name = "sample-selections-vignette")
 ```
   
   

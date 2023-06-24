@@ -2,10 +2,10 @@
 
 
 
-# convert to wide first then merge
 
-#' Title Convert  OS data to wide
-#' Description Convert OS data to wide and merge with clinical data
+#' Convert  OS data to wide
+#' 
+#' Convert OS data to wide and merge with clinical data
 #' 
 #' @param clinical_df A data frame with clinical data at Find typically from Open Clinica.
 #' @param specimen_df A data frame with specimen data at Find generally Open Specimen.
