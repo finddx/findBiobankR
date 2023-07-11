@@ -4,10 +4,12 @@
 \alias{read_multiple_sheets}
 \title{Read Sheets  From excel workbook}
 \usage{
-read_multiple_sheets(file_path)
+read_multiple_sheets(file_path, ...)
 }
 \arguments{
 \item{file_path}{path to file}
+
+\item{...}{Other parameters from read excel function}
 }
 \value{
 returns a list of data frames

@@ -44,6 +44,7 @@ library(data.table)
 #> The following objects are masked from 'package:dplyr':
 #> 
 #>     between, first, last
+library(knitr)
 
 data("tb_data", package = "findBiobankR")
 data("tb_specimen_df", package = "findBiobankR")
@@ -162,3 +163,42 @@ knitr::kable(head(df, 2))
 |:-------------------|:-------------------|
 | TB0990100010101001 | TB0990100010101002 |
 | TB0990100020101001 | TB0990100020101002 |
+
+## Find has a positive/negative outcome based on several tests
+
+- Find if a participant had any of respiratory symptoms
+
+``` r
+data("tb_resp_symptoms")
+
+respirotory_symptoms <- c("COUGH", "EXPECTORATION",
+                          "HEMOPTYSIS", "CHEST_PAIN",
+                          "DYSPNOE")
+kable(head(tb_resp_symptoms, 5))
+```
+
+| COUGH | EXPECTORATION | HEMOPTYSIS | CHEST_PAIN | DYSPNOE |  ID |
+|:------|:--------------|:-----------|:-----------|:--------|----:|
+| No    | No            | No         | No         | No      |   1 |
+| No    | No            | Yes        | No         | No      |   2 |
+| Yes   | No            | No         | Yes        | No      |   3 |
+| Yes   | No            | No         | Yes        | No      |   4 |
+| No    | No            | Yes        | No         | No      |   5 |
+
+``` r
+outcome_df  <- any_pos_any_neg(df = tb_resp_symptoms, 
+                 test_cols =respirotory_symptoms ,
+                 test_type = "resp_symp" ,
+                 neg_value ="No",
+                 pos_value = "Yes",
+                 id_cols ="ID")
+kable(head(outcome_df, 5))
+```
+
+|  ID | resp_symp_any_neg | resp_symp_any_pos | resp_symp_pos_no | resp_symp_neg_no |
+|----:|:------------------|:------------------|-----------------:|-----------------:|
+|   1 | TRUE              | FALSE             |                0 |                5 |
+|   2 | TRUE              | TRUE              |                1 |                4 |
+|   3 | TRUE              | TRUE              |                2 |                3 |
+|   4 | TRUE              | TRUE              |                2 |                3 |
+|   5 | TRUE              | TRUE              |                1 |                4 |

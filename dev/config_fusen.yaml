@@ -1,0 +1,19 @@
+biobank_reports.Rmd:
+  path: dev/biobank_reports.Rmd
+  state: active
+  R:
+  - R/any_pos_any_neg.R
+  - R/data_table.R
+  - R/read_multiple_sheets.R
+  tests:
+  - tests/testthat/test-data_table.R
+  - tests/testthat/test-read_multiple_sheets.R
+  - tests/testthat/test-any_pos_any_neg.R
+  vignettes: vignettes/biobank-reports.Rmd
+  inflate:
+    flat_file: dev/biobank_reports.Rmd
+    vignette_name: biobank-reports
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: ask

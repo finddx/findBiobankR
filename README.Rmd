@@ -42,6 +42,7 @@ devtools::install_github("finddx/findBiobankR")
 library(findBiobankR)
 library(dplyr)
 library(data.table)
+library(knitr)
 
 data("tb_data", package = "findBiobankR")
 data("tb_specimen_df", package = "findBiobankR")
@@ -119,5 +120,26 @@ df <- select_many_aliquots(clin_specs$NP_labels_serum, aliquots = 2) %>%
   as.data.frame()
 # You can then bind cols to the original data
 knitr::kable(head(df, 2))
+```
+
+
+## Find has a positive/negative outcome based on several tests 
+
+- Find if a participant had any of respiratory symptoms 
+
+```{r}
+data("tb_resp_symptoms")
+
+respirotory_symptoms <- c("COUGH", "EXPECTORATION",
+                          "HEMOPTYSIS", "CHEST_PAIN",
+                          "DYSPNOE")
+kable(head(tb_resp_symptoms, 5))
+outcome_df  <- any_pos_any_neg(df = tb_resp_symptoms, 
+                 test_cols =respirotory_symptoms ,
+                 test_type = "resp_symp" ,
+                 neg_value ="No",
+                 pos_value = "Yes",
+                 id_cols ="ID")
+kable(head(outcome_df, 5))
 ```
 
