@@ -101,8 +101,10 @@ test_that("data_table displays datatable correctly", {
 #' Read Files From excel workbook 
 #' 
 #' @param file_path path to file  
+#' @param ... Other parameters from read excel function 
 #' @return returns a list of data frames 
 #' @importFrom readxl read_excel excel_sheets
+#' @importFrom data.table setDT 
 #' @importFrom purrr  set_names possibly
 #' @importFrom tools file_ext
 #' @importFrom janitor make_clean_names
@@ -110,7 +112,7 @@ test_that("data_table displays datatable correctly", {
 #' 
 #' @export
 #'
-read_multiple_sheets <- function(file_path){
+read_multiple_sheets <- function(file_path, ...){
     
     
     if(isFALSE(file.exists(file_path))) {
@@ -134,12 +136,13 @@ read_multiple_sheets <- function(file_path){
     
     list_of_files <- lapply(xl_sheets, function(x){
         
-        possi_excel(file_path, sheet = x)
+        possi_excel(file_path, sheet = x, ...) %>%
+
+      setDT()
         
-    })  %>% 
-        set_names(xl_sheets_clean)
+    })%>% set_names(xl_sheets_clean)
     
-    list_of_files
+   
     
 }
 ```
@@ -191,6 +194,95 @@ test_that("Returns a list of data frames for a valid xlsx file", {
 
 
 
+```
+
+
+# any_pos_any_neg
+    
+```{r function-any_pos_any_neg}
+#' Find any positve gven a list of column
+#' 
+#' Given a list of column names eg symptoms find if there are any positives
+#' @param df A data.frame or data.table or tibble 
+#' @param test_cols a vector of column names eg cols measuring symptoms
+#' @param neg_value a value that shows  the negative outcome in test_cols
+#' @param pos_value a value that measures the positive outcome in test_cols
+#' @param id_cols A vector of column names in df that you would want included eg participant ID
+#' @param test_type vector of length one to be appended to output name
+#' @importFrom data.table setDT 
+#' @return A data.table
+#' 
+#' @export
+any_pos_any_neg <-  function(df, 
+                             test_cols,
+                             test_type ,
+                             neg_value ="No",
+                             pos_value = "Yes",
+                             id_cols =c("Participant_PPID") ){
+  
+  
+  if(isFALSE(inherits(df, "data.table"))){
+    
+      setDT(df)
+  }
+  
+   if(isFALSE(length(test_type) == 1)){
+    
+      stop("test_type should be a vector of length one")
+  }
+
+
+  df[, (test_cols) := lapply(.SD, function(x) ifelse(is.na(x), "", x)), .SDcols = test_cols]
+
+  any_neg = paste0(test_type, "_any_neg")
+  any_pos = paste0(test_type, "_any_pos")
+  pos_no = paste0(test_type, "_pos_no")
+  neg_no = paste0(test_type, "_neg_no")
+  
+  row_nums = seq_len(nrow(df))
+  
+  cols_interest <- c(id_cols,any_neg,
+                     any_pos,  pos_no,
+                     neg_no)
+  
+  df[, (any_pos) := any(.SD== pos_value), .SDcols = test_cols , by = row_nums]
+  
+  df[, (any_neg) := any(.SD== neg_value), .SDcols = test_cols , by = row_nums]
+  
+  
+  df[, (pos_no) :=sum(.SD ==pos_value), .SDcols = test_cols, by = row_nums]
+  
+  
+  df[, (neg_no) :=sum(.SD == neg_value), .SDcols = test_cols, by = row_nums]
+  
+  df <- df[, .SD, .SDcols = cols_interest]
+  
+  df
+}
+```
+
+
+
+```{r example-any_pos_any_neg}
+data("tb_resp_symptoms")
+
+respirotory_symptoms <- c("COUGH", "EXPECTORATION",
+                          "HEMOPTYSIS", "CHEST_PAIN",
+                          "DYSPNOE")
+
+any_pos_any_neg(df = tb_resp_symptoms, 
+                 test_cols =respirotory_symptoms ,
+                 test_type = "resp_symp" ,
+                 neg_value ="No",
+                 pos_value = "Yes",
+                 id_cols ="ID")
+```
+
+
+```{r tests-any_pos_any_neg}
+test_that("any_pos_any_neg works", {
+  expect_true(inherits(any_pos_any_neg, "function")) 
+})
 ```
   
 

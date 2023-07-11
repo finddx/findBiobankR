@@ -162,3 +162,47 @@ create_save_workbook(list_of_dfs =iris_split,
                      path_name = "inst/extdata/iris_species.xlsx",
                      sheet_names = names(iris_split))
 
+
+respirotory_symptoms <- c("COUGH", "EXPECTORATION",
+                          "HEMOPTYSIS", "CHEST_PAIN",
+                          "DYSPNOE")
+
+valresp <- c("Yes", "No")
+
+list_colsresp <- lapply(seq_along(respirotory_symptoms), function(x){
+
+    valresp
+
+})
+library(dplyr)
+library(data.table)
+simulate_df <- function(list_cols, n_persons = 5, nms_list = respirotory_symptoms){
+
+    list_3 = vector(mode = "list",
+                    length = length(list_cols))
+
+    for (i in seq_along(list_cols)) {
+        nmi = nms_list[i]
+        this_i = list_cols[[i]]
+        n_len = length(this_i)
+        this_is = sample(this_i, size = n_persons, replace = T)
+        list_3[[i]] = this_is
+    }
+
+    names(list_3) <- nms_list
+
+    simulated_vars <- bind_cols(list_3) %>%
+        setDT()
+
+
+    simulated_vars
+}
+
+tb_resp_symptoms = simulate_df(list_colsresp)
+
+tb_resp_symptoms[, ID:= 1:.N]
+
+
+usethis::use_data(tb_resp_symptoms, overwrite = TRUE)
+
+checkhelper::use_data_doc("tb_resp_symptoms")

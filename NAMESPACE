@@ -2,6 +2,7 @@
 
 export("%>%")
 export(.data)
+export(any_pos_any_neg)
 export(as_label)
 export(as_name)
 export(convert_os_df_to_wide)
