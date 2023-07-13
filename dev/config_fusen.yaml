@@ -17,3 +17,22 @@ biobank_reports.Rmd:
     check: true
     document: true
     overwrite: ask
+sample_selections.Rmd:
+  path: dev/sample_selections.Rmd
+  state: active
+  R:
+  - R/convert_os_df_to_wide.R
+  - R/select_many_aliquots.R
+  - R/select_one_aliquot.R
+  tests:
+  - tests/testthat/test-convert_os_df_to_wide.R
+  - tests/testthat/test-select_one_aliquot.R
+  - tests/testthat/test-select_many_aliquots.R
+  vignettes: vignettes/sample-selections-vignette.Rmd
+  inflate:
+    flat_file: dev/sample_selections.Rmd
+    vignette_name: sample-selections-vignette
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: ask

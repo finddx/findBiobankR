@@ -164,7 +164,7 @@ knitr::kable(head(df, 2))
 | TB0990100010101001 | TB0990100010101002 |
 | TB0990100020101001 | TB0990100020101002 |
 
-## Find has a positive/negative outcome based on several tests
+## Find is a patient has a positive/negative outcome based on several tests
 
 - Find if a participant had any of respiratory symptoms
 
@@ -202,3 +202,27 @@ kable(head(outcome_df, 5))
 |   3 | TRUE              | TRUE              |                2 |                3 |
 |   4 | TRUE              | TRUE              |                2 |                3 |
 |   5 | TRUE              | TRUE              |                1 |                4 |
+
+## Select number of patients
+
+- From `convert_os_df_to_wide` output select 1 patients tb neg and 2 tb
+  pos
+
+``` r
+## select 2 patients per group 
+patient_groups  <- c("TB, Neg", "TB, Pos")
+number_per_group  <- c(1, 2)
+sort_cols = "NP_aliqN_serum"
+clin_specs_2 <- select_patients_per_group(df = clin_specs, 
+                                          patient_group_col = "tb_group",
+                                          patient_groups = patient_groups,
+                                          number_per_group = number_per_group,
+                                          sort_cols = sort_cols)
+kable(clin_specs_2)
+```
+
+| ppid        | tb_group | hiv_status | sex    | country | NP_aliqN_serum | NP_labels_serum                                            | NP_aliqN_plasma | NP_labels_plasma                                           | aliquot1_dt        | aliquot2_dt        |
+|:------------|:---------|:-----------|:-------|:--------|---------------:|:-----------------------------------------------------------|----------------:|:-----------------------------------------------------------|:-------------------|:-------------------|
+| TB099010001 | TB, Neg  | Unkown     | Male   | Peru    |              3 | TB0990100010101001, TB0990100010101002, TB0990100010101003 |               3 | TB0990100010103001, TB0990100010103002, TB0990100010103003 | TB0990100010101001 | TB0990100010101002 |
+| TB099010003 | TB, Pos  | HIV-       | Male   | Peru    |              3 | TB0990100030101001, TB0990100030101002, TB0990100030101003 |               3 | TB0990100030103001, TB0990100030103002, TB0990100030103003 | TB0990100030101001 | TB0990100030101002 |
+| TB099010005 | TB, Pos  | HIV+       | Female | Peru    |              3 | TB0990100050101001, TB0990100050101002, TB0990100050101003 |               3 | TB0990100050103001, TB0990100050103002, TB0990100050103003 | TB0990100050101001 | TB0990100050101002 |

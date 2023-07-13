@@ -123,7 +123,7 @@ knitr::kable(head(df, 2))
 ```
 
 
-## Find has a positive/negative outcome based on several tests 
+## Find is a patient has a positive/negative outcome based on several tests 
 
 - Find if a participant had any of respiratory symptoms 
 
@@ -141,5 +141,22 @@ outcome_df  <- any_pos_any_neg(df = tb_resp_symptoms,
                  pos_value = "Yes",
                  id_cols ="ID")
 kable(head(outcome_df, 5))
+```
+
+## Select number of patients 
+
+- From `convert_os_df_to_wide` output select 1 patients tb neg and 2 tb pos
+
+```{r}
+## select 2 patients per group 
+patient_groups  <- c("TB, Neg", "TB, Pos")
+number_per_group  <- c(1, 2)
+sort_cols = "NP_aliqN_serum"
+clin_specs_2 <- select_patients_per_group(df = clin_specs, 
+                                          patient_group_col = "tb_group",
+                                          patient_groups = patient_groups,
+                                          number_per_group = number_per_group,
+                                          sort_cols = sort_cols)
+kable(clin_specs_2)
 ```
 

@@ -410,7 +410,103 @@ test_that("select_many_aliquots returns correct aliquots", {
   
 ```
   
+ # select_patients_per_group
+    
+```{r function-select_patients_per_group}
+#' Select patients per group
+#' For sample selections often this is based on patient groups and required number of patients maybe be different per patient group. This function helps with this selection 
+#' @param df A data.frame with clinical data and number of aliquots per patient column 
+#' @param patient_group_col The column name with patient characterization 
+#' @param patient_groups A vector of patient group. This names should be categories in patient_group_col
+#' @param number_per_group A vector same length indicating how many patient to select per group 
+#' @param sort_cols column(s) names that should be used to sort your data frame. We prefer to select patients with higher of aliquots 
+#' @importFrom data.table setDT rbindlist setorderv
+#' @return data.table 
+#' 
+#' @export
+select_patients_per_group <- function(df, 
+                            patient_group_col,
+                            patient_groups,
+                            number_per_group,
+                            sort_cols
+                            ){
+   # Check that the number_per_group vector is the same length as the patient_groups vector
+  if (length(number_per_group) != length(patient_groups)) {
+    stop("The number_per_group vector is not the same length as the patient_groups vector")
+  }
   
+  setDT(df)
+  list_selected = vector(mode = "list", 
+                         length = length(patient_groups))
+  
+  for (i in seq_along(patient_groups)) {
+    
+    patient_grp = patient_groups[i]
+    no_i = number_per_group[i]
+    df1 = df[get(patient_group_col)  ==patient_grp ]
+    if(isFALSE(nrow(df1) >= no_i)){
+      
+      stop_mess = glue::glue("Patient group {patient_grp} has insuficient number of participants for \\
+                          group, The number of participant required \\
+                          are {no_i}, the number available is {nrow(df1)}")
+      stop(stop_mess)
+    }
+    setorderv(df1,cols = sort_cols, order = -1L)
+    
+    df1 = df1[1:no_i]
+    list_selected[[i]] = df1
+    
+  }
+  df_final = rbindlist(list_selected)
+  df_final
+}
+```
+
+
+
+```{r example-select_patients_per_group}
+
+library(data.table)
+library(dplyr)
+data("tb_data", package = "findBiobankR")
+data("tb_specimen_df", package = "findBiobankR")
+
+# required clinical cols
+clinical_cols <- c("tb_group", "hiv_status", "sex", "country") 
+
+clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
+                                     specimen_df = tb_specimen_df, 
+                                     join_by_col = "ppid",
+                                     specimen_col ="specimen_type" ,
+                                     clinical_vars = clinical_cols ,
+                                     specimen_label_col = "specimen_label",
+                                     os_aliquot_names = c("Serum", "Plasma")
+)
+
+
+## select 2 patients per group 
+patient_groups  <- c("TB, Neg", "TB, Pos")
+number_per_group  <- c(2, 2)
+sort_cols = "NP_aliqN_serum"
+clin_specs_2 <- select_patients_per_group(df = clin_specs, 
+                                          patient_group_col = "tb_group",
+                                          patient_groups = patient_groups,
+                                          number_per_group = number_per_group,
+                                          sort_cols = sort_cols)
+
+
+```
+
+ 
+```{r tests-select_patients_per_group}
+
+test_that("select_patients_per_group works", {
+  expect_true(inherits(select_patients_per_group, "function")) 
+})
+
+
+```
+   
   
 ```{r development-load}
   # Load already included functions if relevant
