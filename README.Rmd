@@ -123,7 +123,7 @@ knitr::kable(head(df, 2))
 ```
 
 
-## Find is a patient has a positive/negative outcome based on several tests 
+## Find if a patient has a positive/negative outcome based on several tests 
 
 - Find if a participant had any of respiratory symptoms 
 

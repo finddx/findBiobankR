@@ -506,8 +506,314 @@ test_that("select_patients_per_group works", {
 
 
 ```
-   
+
+# selected_aliquots_df
+    
+```{r function-selected_aliquots_df}
+#' Create a data frame with selected aliquots in long format
+#'
+#' @description
+#' This function is used in conjunction from other findBiobankR package. It accepts an a data drame/data.table 
+#' with selected aliquots as a column 
+#' @seealso findBiobank::select_one_aliquot
+#' @param clin_specs A data from with the selected aliquots as column
+#' @param aliquot_cols Column names of the selected aliquots in `clin_specs` data frame
+#' @param ppid_col Participant ID column 
+#' @param aliquot_name_col The name of the variable name after data.table::melt
+#' @param spec_label_col The name of the value name after data.table::melt
+#' @importFrom stringr str_replace_all str_trim
+#' @importFrom data.table melt setDT
+#' @return a data.table with `ppid, specimen_label_col` columns 
+#' 
+#' @export
+#' 
+selected_aliquots_df <- function(clin_specs,
+                                 aliquot_cols,
+                                 ppid_col = "Participant_PPID",
+                                 aliquot_name_col = "aliquot_name",
+                                 spec_label_col = "specimen_label"){
   
+  
+  data_name = deparse(substitute(clin_specs))
+  
+  if(isFALSE(inherits(clin_specs, "data.table"))){
+    
+    msg = sprintf("%s is a data.frame converting this to data.table", data_name)
+    message(msg)
+  }
+  nms_selected_labels <- c(ppid_col,aliquot_cols)
+  
+  urien23selected <- clin_specs[, .SD, .SDcols = nms_selected_labels]
+  
+  
+  
+  urien23selected_m <- melt(urien23selected, 
+                            id.vars =ppid_col,
+                            variable.name = aliquot_name_col,
+                            value.name = spec_label_col)
+  
+  urien23selected_m[, (aliquot_name_col) := NULL]
+  
+  urien23selected_m <- urien23selected_m[!is.na(get(spec_label_col))]
+  
+  urien23selected_m <- unique(urien23selected_m,
+                              by ="specimen_label")
+  urien23selected_m[, (spec_label_col) := str_replace_all(get(spec_label_col), '"|\\)|\\(|^c', '')]
+  urien23selected_m[, (spec_label_col) := str_trim(get(spec_label_col))]
+  urien23selected_m
+}
+```
+  
+```{r example-selected_aliquots_df}
+
+library(data.table)
+library(dplyr)
+data("tb_data", package = "findBiobankR")
+data("tb_specimen_df", package = "findBiobankR")
+
+# required clinical cols
+clinical_cols <- c("tb_group", "hiv_status", "sex", "country") 
+
+clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
+                                     specimen_df = tb_specimen_df, 
+                                     join_by_col = "ppid",
+                                     specimen_col ="specimen_type" ,
+                                     clinical_vars = clinical_cols ,
+                                      specimen_label_col = "specimen_label",
+                                     os_aliquot_names = c("Serum", "Plasma")
+)
+
+
+clin_specs[, serum_aliquot := select_one_aliquot(NP_labels_serum, aliquot_number = 1 )]
+clin_specs[, plasma_aliquot := select_one_aliquot(NP_labels_plasma, aliquot_number= 1 )]
+# or tidyverse way
+selected_aliquots_df(clin_specs,
+                     aliquot_cols = c("serum_aliquot","plasma_aliquot"),
+                     ppid_col = "ppid")
+```
+  
+```{r tests-selected_aliquots_df}
+test_that("selected_aliquots_df works", {
+  expect_true(inherits(selected_aliquots_df, "function")) 
+})
+```
+
+# make_clean_os_names
+    
+```{r function-make_clean_os_names}
+#' Clean Open Specimen Names
+#' 
+#' @description
+#' Data set from Open specimen normally come with very programming unfriendly column
+#' names with repeat suffixes # and so on this function attempts to correct this
+#' 
+#' @param names_os_df column names from Open specimen data
+#' @importFrom stringr str_trim str_split
+#' @importFrom janitor make_clean_names
+#' @return A character vector of names
+#' 
+#' @export
+make_clean_os_names <- function(names_os_df){
+   
+   
+  nms_break = make_clean_names(names_os_df) %>%
+    str_trim
+
+  
+  split_nms <- lapply(nms_break,  str_split, "_")
+  
+  new_names <- vector(mode = "character",
+                      length = length(nms_break))
+  
+  
+  
+  for(i in 1:length(split_nms)){
+    
+    this_s = split_nms[[i]] %>% unlist()
+    tru_same = this_s[1] == this_s[2]
+    
+    if(tru_same& length(this_s) >= 2){
+      
+      this_s = this_s[-1]
+    }
+    
+    this_s = paste0(this_s, collapse = "_")
+    new_names[i] = this_s
+  }
+  
+  
+  new_names
+}
+```
+  
+```{r example-make_clean_os_names}
+
+nms_os <- c("Participant_PPID", "Visit_Visit Site",
+            "Visit_Name", "Visit_Event Label", 
+            "Specimen_Specimen Label",
+            "Specimen_Type", "Specimen_Lineage", "Specimen_Barcode", 
+            "Specimen_Container Name", "Specimen_Container Position", 
+            "Specimen_Requirement Name", "Collection Protocol_Short Title")
+
+make_clean_os_names(nms_os)
+```
+  
+```{r tests-make_clean_os_names}
+test_that("del_repeat_os_names works", {
+  expect_true(inherits(make_clean_os_names, "function")) 
+})
+```
+  
+# append_check_col
+    
+```{r function-append_check_col}
+#' Append excel if condition
+#' @description
+#' usually we usually add a true false column to check if the shipped barcode is 
+#' the barcode/specimen label  we selected. This function does exactly that it combines
+#' OS data set and selected 
+#' @param selected_samples A data frame from findBiobankR::selected_aliquots_df. If this is null please ensure that
+#' os data set contains only column to send 
+#' @param os_position This a data set that comes from open specimen
+#' @param join_by_col column names in 
+#' @importFrom utils object.size
+#' @return A data.table with a checked column 
+#' 
+#' @export
+
+# nms_new_pos <- c( "Specimen_Type", "Specimen_Requirement Name", 
+#                   "Specimen_Specimen Label", "Specimen_Barcode", "Specimen_Container Name", 
+#                   "Specimen_Container Position", "Scanned_barcode")
+# 
+# nms_old_pos <- c( "specimen_type", "specimen_requirement_name", 
+#                   "specimen_label", "specimen_barcode", "specimen_container_name", 
+#                   "specimen_container_position", "scanned_barcode")
+
+
+append_check_col <- function(selected_samples = NULL,
+                             os_position,
+                             ppid_col = "Participant_PPID",
+                             specimen_id_col = "specimen_label",
+                             os_required_cols = c("Specimen_Specimen Label",
+                                                  "Specimen_Type", "Specimen_Requirement Name", 
+                                                  "Specimen_Barcode","Specimen_Container Name", 
+                                                  "Specimen_Container Position"),
+                             scanned_bar_code_col = "Scanned_barcode"){
+  
+  
+  join_by_col = c(ppid_col, specimen_id_col)
+  object_size = object.size(os_position)
+  os_position[, (scanned_bar_code_col) := ""]
+  nms_os = names(os_position)
+  #nms_os = nms_os[nms_os %in% join_by_col]
+  nms_os_c = make_clean_os_names(nms_os)
+  
+  setnames(os_position, old = nms_os, new = nms_os_c)
+  
+  join_by_col_neg = join_by_col[join_by_col %in% os_required_cols]
+  required_cols = c(os_required_cols, 
+                    scanned_bar_code_col) %>%
+    unique()
+  
+  nms_old_pos = make_clean_os_names(required_cols)
+  
+  if(isFALSE(is.null(selected_samples))){
+    
+    os_selected <- merge(selected_samples,
+                         os_position, 
+                         by = join_by_col)
+    
+  }else{
+    
+    os_selected = os_position
+    
+  }
+  
+  
+  if(isFALSE(all(nms_old_pos %in% nms_os_c))){
+    
+    nms_missing = nms_old_pos[!nms_old_pos %in% nms_os_c] %>%
+      paste0(collapse = ",")
+    msg = sprintf("The following required column names were not found %s", nms_missing)
+    stop(msg)
+    
+  }
+  
+  
+  #os_selected[, scanned_barcode := ""]
+  nms_old_pos_2 <- c(ppid_col, nms_old_pos) %>% unique()
+  os_selected <- os_selected[, ..nms_old_pos]
+  os_selected[, specimen_barcode := gsub("^0","", specimen_barcode) ]
+  os_selected[, specimen_barcode := paste0("0", specimen_barcode) ]
+  nms_f <- names(os_selected)
+  
+  barcode_id <- which(nms_f == "specimen_barcode")
+  scanned_id <- which(nms_f == "scanned_barcode")
+  barcode_letter <- LETTERS[barcode_id]
+  scanned_barcode_letter <- LETTERS[scanned_id]
+  n_rows = 1:nrow(os_selected)
+  excel_rows = n_rows+1
+  barcode_rows <- paste0(barcode_letter, excel_rows)
+  scanned_barcode_rows <- paste0(scanned_barcode_letter, excel_rows)
+  os_selected[, checked :=paste0("IF(", barcode_rows,"=",scanned_barcode_rows,",1", ", 0",")" ) ]
+  
+  
+  os_selected[, specimen_barcode := fifelse(specimen_barcode == "0", specimen_label,specimen_barcode ) ]
+  
+  setnames(os_selected, nms_old_pos, required_cols)
+  
+  class(os_selected$checked) <- c(class(os_selected$checked), "formula")
+  
+  os_selected
+}
+```
+
+
+
+```{r example-append_check_col}
+
+library(data.table)
+library(dplyr)
+data("tb_data", package = "findBiobankR")
+#data("tb_specimen_df", package = "findBiobankR")
+
+# required clinical cols
+clinical_cols <- c("tb_group", "hiv_status", "sex", "country") 
+
+clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
+                                     specimen_df = tb_specimen_df, 
+                                     join_by_col = "ppid",
+                                     specimen_col ="specimen_type" ,
+                                     clinical_vars = clinical_cols ,
+                                     specimen_label_col = "specimen_label",
+                                     os_aliquot_names = c("Serum", "Plasma")
+)
+
+
+clin_specs[, serum_aliquot := select_one_aliquot(NP_labels_serum, aliquot_number = 1 )]
+clin_specs[, plasma_aliquot := select_one_aliquot(NP_labels_plasma, aliquot_number= 1 )]
+
+# or tidyverse way
+
+selected_samples <- selected_aliquots_df(clin_specs,
+                                         aliquot_cols = c("serum_aliquot","plasma_aliquot"),
+                                         ppid_col = "ppid")
+
+df_send <- append_check_col(selected_samples = selected_samples,
+                            os_position = tb_specimen_df,
+                            ppid_col = "ppid",
+                            specimen_id_col = "specimen_label")
+
+
+```
+  
+```{r tests-append_check_col}
+test_that("append_check_col works", {
+  expect_true(inherits(append_check_col, "function")) 
+})
+```
+  
+
 ```{r development-load}
   # Load already included functions if relevant
 pkgload::load_all(export_all = FALSE)

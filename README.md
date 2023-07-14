@@ -164,7 +164,7 @@ knitr::kable(head(df, 2))
 | TB0990100010101001 | TB0990100010101002 |
 | TB0990100020101001 | TB0990100020101002 |
 
-## Find is a patient has a positive/negative outcome based on several tests
+## Find if a patient has a positive/negative outcome based on several tests
 
 - Find if a participant had any of respiratory symptoms
 
