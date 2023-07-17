@@ -52,7 +52,8 @@ clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
 
 clin_specs[, serum_aliquot := select_one_aliquot(NP_labels_serum, aliquot_number = 1 )]
 clin_specs[, plasma_aliquot := select_one_aliquot(NP_labels_plasma, aliquot_number= 1 )]
-# or tidyverse way
+
+## prepare data set
 selected_aliquots_df(clin_specs,
                      aliquot_cols = c("serum_aliquot","plasma_aliquot"),
                      ppid_col = "ppid")

@@ -21,7 +21,13 @@ os data set contains only column to send}
 
 \item{os_position}{This a data set that comes from open specimen}
 
-\item{join_by_col}{column names in}
+\item{ppid_col}{Participant id column.}
+
+\item{specimen_id_col}{Specimen ID column name}
+
+\item{os_required_cols}{Column names required to send a list to a requester}
+
+\item{scanned_bar_code_col}{The name of the barcode column name with retrieved specimens}
 }
 \value{
 A data.table with a checked column
@@ -65,5 +71,5 @@ df_send <- append_check_col(selected_samples = selected_samples,
                             ppid_col = "ppid",
                             specimen_id_col = "specimen_label")
 
-
+df_send
 }

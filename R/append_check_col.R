@@ -8,8 +8,12 @@
 #' @param selected_samples A data frame from findBiobankR::selected_aliquots_df. If this is null please ensure that
 #' os data set contains only column to send 
 #' @param os_position This a data set that comes from open specimen
-#' @param join_by_col column names in 
+#' @param ppid_col Participant id column. 
+#' @param specimen_id_col Specimen ID column name
+#' @param os_required_cols Column names required to send a list to a requester
+#' @param scanned_bar_code_col The name of the barcode column name with retrieved specimens 
 #' @importFrom utils object.size
+#' @importFrom data.table fifelse setDT
 #' @return A data.table with a checked column 
 #' 
 #' @export
@@ -47,7 +51,7 @@
 #'                             ppid_col = "ppid",
 #'                             specimen_id_col = "specimen_label")
 #'
-#'
+#' df_send
 
 # nms_new_pos <- c( "Specimen_Type", "Specimen_Requirement Name", 
 #                   "Specimen_Specimen Label", "Specimen_Barcode", "Specimen_Container Name", 
@@ -107,7 +111,7 @@ append_check_col <- function(selected_samples = NULL,
     
   }
   
-  
+  setDT(os_selected)
   #os_selected[, scanned_barcode := ""]
   nms_old_pos_2 <- c(ppid_col, nms_old_pos) %>% unique()
   os_selected <- os_selected[, ..nms_old_pos]

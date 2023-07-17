@@ -174,7 +174,8 @@ clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
 
 clin_specs[, serum_aliquot := select_one_aliquot(NP_labels_serum, aliquot_number = 1 )]
 clin_specs[, plasma_aliquot := select_one_aliquot(NP_labels_plasma, aliquot_number= 1 )]
-# or tidyverse way
+
+## prepare data set
 selected_aliquots_df(clin_specs,
                      aliquot_cols = c("serum_aliquot","plasma_aliquot"),
                      ppid_col = "ppid")
@@ -242,6 +243,98 @@ df_send <- append_check_col(selected_samples = selected_samples,
                             ppid_col = "ppid",
                             specimen_id_col = "specimen_label")
 
+df_send
+```
+
+  
+  
+  
+
+# process_save_selected_aliquots
+
+    
+
+  
+
+```{r example-process_save_selected_aliquots}
+
+library(data.table)
+library(dplyr)
+data("tb_data", package = "findBiobankR")
+#data("tb_specimen_df", package = "findBiobankR")
+
+# required clinical cols
+clinical_cols <- c("tb_group", "hiv_status", "sex", "country") 
+
+clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
+                                     specimen_df = tb_specimen_df, 
+                                     join_by_col = "ppid",
+                                     specimen_col ="specimen_type" ,
+                                     clinical_vars = clinical_cols ,
+                                     specimen_label_col = "specimen_label",
+                                     os_aliquot_names = c("Serum", "Plasma")
+)
+
+
+clin_specs[, serum_aliquot := select_one_aliquot(NP_labels_serum, aliquot_number = 1 )]
+clin_specs[, plasma_aliquot := select_one_aliquot(NP_labels_plasma, aliquot_number= 1 )]
+
+
+selected_samples <- selected_aliquots_df(clin_specs,
+                                         aliquot_cols = c("serum_aliquot","plasma_aliquot"),
+                                         ppid_col = "ppid")
+
+path_name <- tempfile(pattern = "create_work_book") %>%
+  normalizePath(winslash = "/")
+
+dir.create(path_name)
+
+# create file name
+path_name <- file.path(path_name, "aliquots.xlsx")
+
+process_save_selected_aliquots(file_path = path_name,
+                               selected_samples = selected_samples,
+                               os_position = tb_specimen_df,
+                               ppid_col = "ppid",
+                               specimen_id_col = "specimen_label")
+
+```
+
+  
+
+  
+  
+
+# create_save_workbook
+
+    
+
+  
+
+```{r example-create_save_workbook}
+
+df1 <- data.frame(x = 1:10, y = 11:20)
+df2 <- data.frame(a = letters[1:5], b = letters[6:10])
+list_of_dfs <- list(df1, df2)
+
+# Specify the names of the sheets
+sheet_names <- c("Sheet1", "Sheet2")
+
+#create temporary folder 
+path_name <- tempfile(pattern = "create_work_book") |>
+  normalizePath(winslash = "/")
+
+dir.create(path_name)
+
+# create file name
+file_name <- file.path(path_name, "test.xlsx")
+
+# Create the workbook
+create_save_workbook(list_of_dfs,
+                     path_name = file_name, 
+                     sheet_names)
+file.remove(file_name)
+unlink(path_name)
 
 ```
 
