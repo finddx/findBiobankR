@@ -111,6 +111,17 @@ tb_specimen_df[, specimen_type := factor(specimen_type,
                                       levels = specs_code,
                                       labels = specs_labels)]
 
+nms_old_pos <- c("specimen_type", "specimen_requirement_name",
+                 "specimen_label", "specimen_barcode", "specimen_container_name",
+                 "specimen_container_position", "scanned_barcode")
+
+nms_old_pos[!nms_old_pos %in% names(tb_specimen_df)]
+tb_specimen_df[, specimen_requirement_name := specimen_type]
+tb_specimen_df[, specimen_barcode := ""]
+tb_specimen_df[, specimen_container_name := "ZMC100"]
+tb_specimen_df[, specimen_container_position := as.integer(gl(.N, 81, .N))]
+tb_specimen_df[, specimen_container_name := paste0(specimen_container_name, specimen_container_position)]
+
 
 usethis::use_data(tb_specimen_df, overwrite = TRUE)
 
@@ -126,12 +137,12 @@ id_cols <- c("tb_group", "hiv_status", "sex", "country")
 
 
 
-id_cols_df <- tb_df_clin[, (id_cols) := lapply(.SD, unique), by = ppid, .SDcols = id_cols]
-
-idcols_all <- c("ppid",id_cols)
-
-tb_df_clin <- tb_df[, ..idcols_all] |>
-    unique(by = idcols_all)
+# id_cols_df <- tb_df_clin[, (id_cols) := lapply(.SD, unique), by = ppid, .SDcols = id_cols]
+#
+# idcols_all <- c("ppid",id_cols)
+#
+# tb_df_clin <- tb_df[, ..idcols_all] |>
+#     unique(by = idcols_all)
 
 dir.create("inst/extdata")
 
@@ -158,6 +169,7 @@ create_save_workbook <- function(list_of_dfs, path_name, sheet_names ){
     saveWorkbook(wb, file = path_name)
 }
 
+file.remove("inst/extdata/iris_species.xlsx")
 create_save_workbook(list_of_dfs =iris_split,
                      path_name = "inst/extdata/iris_species.xlsx",
                      sheet_names = names(iris_split))
@@ -206,3 +218,15 @@ tb_resp_symptoms[, ID:= 1:.N]
 usethis::use_data(tb_resp_symptoms, overwrite = TRUE)
 
 checkhelper::use_data_doc("tb_resp_symptoms")
+
+
+nms_new_pos <- c("Participant_PPID", "Specimen_Type", "Specimen_Requirement Name",
+                 "Specimen_Specimen Label", "Specimen_Barcode", "Specimen_Container Name",
+                 "Specimen_Container Position", "Scanned_barcode")
+
+nms_old_pos <- c("Participant_PPID", "specimen_type", "specimen_requirement_name",
+                 "specimen_label", "specimen_barcode", "specimen_container_name",
+                 "specimen_container_position", "scanned_barcode")
+
+ids <- c(nms_old_pos, LETTERS[1:10])
+all(nms_old_pos %in% ids)

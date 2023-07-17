@@ -7,17 +7,20 @@ Authors@R:
 Description: A collection of functions used by Find Biobank team.
 License: MIT + file LICENSE
 Depends: 
-    R (>= 2.10)
+    R (>= 3.60)
 Imports: 
     data.table,
     DT,
     glue,
     janitor,
     magrittr,
+    openxlsx,
     purrr,
     readxl,
     rlang (>= 0.4.11),
-    tools
+    stringr,
+    tools,
+    utils
 Suggests: 
     dplyr,
     knitr,

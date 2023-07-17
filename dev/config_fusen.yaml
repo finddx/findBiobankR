@@ -21,13 +21,23 @@ sample_selections.Rmd:
   path: dev/sample_selections.Rmd
   state: active
   R:
+  - R/append_check_col.R
   - R/convert_os_df_to_wide.R
+  - R/create_save_workbook.R
+  - R/make_clean_os_names.R
+  - R/process_save_selected_aliquots.R
   - R/select_many_aliquots.R
   - R/select_one_aliquot.R
+  - R/selected_aliquots_df.R
   tests:
   - tests/testthat/test-convert_os_df_to_wide.R
   - tests/testthat/test-select_one_aliquot.R
   - tests/testthat/test-select_many_aliquots.R
+  - tests/testthat/test-selected_aliquots_df.R
+  - tests/testthat/test-make_clean_os_names.R
+  - tests/testthat/test-append_check_col.R
+  - tests/testthat/test-process_save_selected_aliquots.R
+  - tests/testthat/test-create_save_workbook.R
   vignettes: vignettes/sample-selections-vignette.Rmd
   inflate:
     flat_file: dev/sample_selections.Rmd
