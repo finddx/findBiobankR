@@ -284,6 +284,91 @@ test_that("any_pos_any_neg works", {
   expect_true(inherits(any_pos_any_neg, "function")) 
 })
 ```
+
+
+# rm_all_na_col
+    
+```{r function-rm_all_na_col}
+#' Removes columns that de selects/deletes  columns with missing rows
+#' 
+#' Given a data.frame, this function will remove columns with missing values above a certain threshold.
+#' 
+#' @param df data.frame 
+#' @param missing_perc threshold to delete columns eg delete with more than 99 % missing number should be between 0 and 100 %
+#' @param na_chars character vectors representing NA's 
+#' @importFrom data.table setDT
+#' @return A data.table 
+#' 
+#' @export
+rm_all_na_col <- function(df, missing_perc = 99.99, na_chars = c("", "NA", " ")){
+  
+  # Check if the `missing_per` argument is between 0 and 1.
+  if (missing_perc < 0 | missing_perc > 100){
+    stop("The `missing_per` argument must be between 0 and 1.")
+  }
+  
+  # Check if the `na_chars` argument is a vector of strings.
+  if (!is.character(na_chars) | length(na_chars) == 0){
+    stop("The `na_chars` argument must be a vector of strings.")
+  }
+  
+  setDT(df)
+  # Replace missing values in the data frame with `NA`.
+  nms = names(df)
+  df[, (nms) := lapply(.SD, function(x) ifelse(x %in% na_chars, NA, x)), .SDcols = names(df)]
+  
+  # Calculate the percentage of missing values for each column.
+  missing_rows_perc <- df[ , lapply(.SD, function(x)sum(is.na(x)/.N * 100)), .SDcols = nms]
+                     
+  missing_rows_perc <-missing_rows_perc[1,] %>% as.numeric()
+  
+  # Identify columns with more than `missing_per` missing values.
+  nms_del <- nms[missing_rows_perc > missing_perc]
+  
+  # Drop the columns with more than `missing_per` missing values.
+  df[, (nms_del) := NULL]
+  
+  return(df)
+}
+
+```
+  
+```{r example-rm_all_na_col}
+library(data.table)
+
+# Create a data frame with missing values.
+df <- data.table(
+  id = 1:10,
+  name = c("John", "Jane", "", "Mary", "Mike", "", "", "Peter", "Sam", "Susan"),
+  age = c(20, 21, 18, 22, 23, 19, NA, 24, 25, 26),
+  height = c(170, 160, 180, 175, 185, 175, NA, 190, 195, 200),
+  plasma_collected = rep(NA, 10)
+)
+
+# Remove columns with more than 99% missing values.
+rm_all_na_col(df, missing_perc = 99.99)
+```
+  
+```{r tests-rm_all_na_col}
+# Test that the function correctly identifies columns with more than 99% missing values.
+test_that("The function correctly identifies columns with more than 99% missing values", {
+  
+  library(data.table)
+  df <- data.table(
+  id = 1:10,
+  name = c("John", "Jane", "", "Mary", "Mike", "", "", "Peter", "Sam", "Susan"),
+  age = c(20, 21, 18, 22, 23, 19, NA, 24, 25, 26),
+  height = c(170, 160, 180, 175, 185, 175, NA, 190, 195, 200),
+  plasma_collected = rep(NA, 10)
+)
+ rm_all_na_col(df, missing_per = 99.99)
+ expect_equal(names(df), c("id", "name", "age", "height"))
+  
+  # Test that the function correctly drops columns with more than 99% missing values.
+  expect_false("plasma_collected" %in% names(df))
+})
+
+```
   
 
 ```{r development-inflate, eval=FALSE}

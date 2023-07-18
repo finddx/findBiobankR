@@ -5,6 +5,7 @@
 #' Save the selected aliquots with the check column data set in excel 
 #'
 #' @param file_path The location to save your file as .xlsx
+#' @param save_file Logical to save file in 
 #' @param ...  arguments taken by findBiobankR::append_check_col
 #' @importFrom tools file_ext
 #' @importFrom openxlsx write.xlsx
@@ -48,26 +49,41 @@
 #' path_name <- file.path(path_name, "aliquots.xlsx")
 #'
 #' process_save_selected_aliquots(file_path = path_name,
+#'                                save_file= TRUE,
 #'                                selected_samples = selected_samples,
 #'                                os_position = tb_specimen_df,
 #'                                ppid_col = "ppid",
-#'                                specimen_id_col = "specimen_label")
+#'                                specimen_id_col = "specimen_label",
+#'                                os_required_cols = c("ppid",
+#'                                                     "Specimen_Specimen Label",
+#'                                                     "Specimen_Type",
+#'                                                     "Specimen_Requirement Name", 
+#'                                                     "Specimen_Barcode",
+#'                                                     "Specimen_Container Name", 
+#'                                                     "Specimen_Container Position",
+#'                                                     "Scanned_barcode"))
 #'
 
-process_save_selected_aliquots <- function(file_path, ...){
+process_save_selected_aliquots <- function(file_path = NULL, save_file= FALSE, ...){
   
-  dir_name = dirname(file_path)
-  
-  if(isFALSE(dir.exists(dir_name))) {
+  if(!is.null(file_path)){
     
-    stop(sprintf("The folder (%s) does not exist, Please check you file path", dir_name))
-  } 
-  
-  file_extension = file_ext(file_path)
-  
-  if(file_extension != "xlsx"){
+    stopifnot( "save_file option should be TRUE when file_path is provided" = isTRUE(save_file))
+    dir_name = dirname(file_path)
     
-    stop("The extension of the file is not an excel file")
+    if(isFALSE(dir.exists(dir_name))) {
+      
+      stop(sprintf("The folder (%s) does not exist, Please check you file path", dir_name))
+    } 
+    
+    file_extension = file_ext(file_path)
+    
+    if(file_extension != "xlsx"){
+      
+      stop("The extension of the file is not an excel file")
+      
+    }
+    
     
   }
   
@@ -75,10 +91,22 @@ process_save_selected_aliquots <- function(file_path, ...){
   selected_aliquots <- append_check_col(...)
   
   
-  message(sprintf("Saving the selected data frame in %s", file_path))
   
-  write.xlsx(selected_aliquots,
-             file = file_path )
+  
+  stopifnot("save_file option should be logical" = isTRUE(is.logical(save_file)))
+  
+  if(isFALSE(save_file)){
+    
+    message(sprintf("File not save. if you want to save please provide arguments file_path and save_file should be true"))
+   
+  }
+  
+  if(save_file){
+    message(sprintf("Saving the selected data frame in %s", file_path))
+    write.xlsx(selected_aliquots,
+               file = file_path ) 
+  }
+  
   return(selected_aliquots)
   
 }

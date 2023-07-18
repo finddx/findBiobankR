@@ -144,6 +144,22 @@ id_cols <- c("tb_group", "hiv_status", "sex", "country")
 # tb_df_clin <- tb_df[, ..idcols_all] |>
 #     unique(by = idcols_all)
 
+variable_name <- c("tb_group",
+                   "hiv_status",
+                   "sex",
+                   "country")
+
+variable_description <- c("TB Group Negative, Positive",
+                          "HIV staus, pos, Neg",
+                          "Sex of participant",
+                          "Country of participant")
+
+tb_dictionary <- data.table(variable_name,variable_description )
+
+usethis::use_data(tb_dictionary, overwrite = TRUE)
+checkhelper::use_data_doc("tb_dictionary")
+
+
 dir.create("inst/extdata")
 
 data("iris")

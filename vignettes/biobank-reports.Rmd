@@ -81,6 +81,30 @@ any_pos_any_neg(df = tb_resp_symptoms,
                  id_cols ="ID")
 ```
 
+# rm_all_na_col
+
+    
+
+  
+
+```{r example-rm_all_na_col}
+library(data.table)
+
+# Create a data frame with missing values.
+df <- data.table(
+  id = 1:10,
+  name = c("John", "Jane", "", "Mary", "Mike", "", "", "Peter", "Sam", "Susan"),
+  age = c(20, 21, 18, 22, 23, 19, NA, 24, 25, 26),
+  height = c(170, 160, 180, 175, 185, 175, NA, 190, 195, 200),
+  plasma_collected = rep(NA, 10)
+)
+
+# Remove columns with more than 99% missing values.
+rm_all_na_col(df, missing_perc = 99.99)
+```
+
+  
+
   
 
 

@@ -608,18 +608,25 @@ test_that("selected_aliquots_df works", {
 #' Data set from Open specimen normally come with very programming unfriendly column
 #' names with repeat suffixes # and so on this function attempts to correct this
 #' 
-#' @param names_os_df column names from Open specimen data
+#' @param names_os_df column names from Open specimen data or Open Specimen data.frame
 #' @importFrom stringr str_trim str_split
 #' @importFrom janitor make_clean_names
-#' @return A character vector of names
-#' 
+#' @return A character vector of names or data.frame
 #' @export
 make_clean_os_names <- function(names_os_df){
-   
-   
+  
+  UseMethod("make_clean_os_names", names_os_df)
+  
+  }
+
+#' @export
+make_clean_os_names.default <- function(names_os_df){
+  
+  stopifnot("names_os_df should be a character vector"=is.character(names_os_df))
+  
   nms_break = make_clean_names(names_os_df) %>%
     str_trim
-
+  
   
   split_nms <- lapply(nms_break,  str_split, "_")
   
@@ -645,6 +652,17 @@ make_clean_os_names <- function(names_os_df){
   
   new_names
 }
+
+
+#' @export
+
+make_clean_os_names.data.frame <- function(names_os_df){
+  
+  nms = names(names_os_df)
+  nms_new = make_clean_os_names(nms)
+  setnames(names_os_df, nms, nms_new )
+}
+
 ```
   
 ```{r example-make_clean_os_names}
@@ -694,33 +712,27 @@ test_that("del_repeat_os_names works", {
 #                   "specimen_label", "specimen_barcode", "specimen_container_name", 
 #                   "specimen_container_position", "scanned_barcode")
 
-
-append_check_col <- function(selected_samples = NULL,
+append_check_col <- function(selected_samples,
                              os_position,
                              ppid_col = "Participant_PPID",
                              specimen_id_col = "specimen_label",
-                             os_required_cols = c("Specimen_Specimen Label",
-                                                  "Specimen_Type", "Specimen_Requirement Name", 
-                                                  "Specimen_Barcode","Specimen_Container Name", 
-                                                  "Specimen_Container Position"),
+                             os_required_cols = c("Participant_PPID",
+                                                  "Specimen_Specimen Label",
+                                                  "Specimen_Type", 
+                                                  "Specimen_Requirement Name", 
+                                                  "Specimen_Barcode",
+                                                  "Specimen_Container Name", 
+                                                  "Specimen_Container Position",
+                                                  "Scanned_barcode"),
                              scanned_bar_code_col = "Scanned_barcode"){
   
   
   join_by_col = c(ppid_col, specimen_id_col)
   object_size = object.size(os_position)
   os_position[, (scanned_bar_code_col) := ""]
-  nms_os = names(os_position)
-  #nms_os = nms_os[nms_os %in% join_by_col]
-  nms_os_c = make_clean_os_names(nms_os)
   
-  setnames(os_position, old = nms_os, new = nms_os_c)
   
-  join_by_col_neg = join_by_col[join_by_col %in% os_required_cols]
-  required_cols = c(os_required_cols, 
-                    scanned_bar_code_col) %>%
-    unique()
-  
-  nms_old_pos = make_clean_os_names(required_cols)
+  nms_old_pos = make_clean_os_names(os_required_cols)
   
   if(isFALSE(is.null(selected_samples))){
     
@@ -734,6 +746,9 @@ append_check_col <- function(selected_samples = NULL,
     
   }
   
+  make_clean_os_names(os_selected)
+  
+  nms_os_c = names(os_selected)
   
   if(isFALSE(all(nms_old_pos %in% nms_os_c))){
     
@@ -745,8 +760,9 @@ append_check_col <- function(selected_samples = NULL,
   }
   
   setDT(os_selected)
-  #os_selected[, scanned_barcode := ""]
-  nms_old_pos_2 <- c(ppid_col, nms_old_pos) %>% unique()
+  
+  
+  
   os_selected <- os_selected[, ..nms_old_pos]
   os_selected[, specimen_barcode := gsub("^0","", specimen_barcode) ]
   os_selected[, specimen_barcode := paste0("0", specimen_barcode) ]
@@ -765,7 +781,7 @@ append_check_col <- function(selected_samples = NULL,
   
   os_selected[, specimen_barcode := fifelse(specimen_barcode == "0", specimen_label,specimen_barcode ) ]
   
-  setnames(os_selected, nms_old_pos, required_cols)
+  setnames(os_selected, nms_old_pos, os_required_cols)
   
   class(os_selected$checked) <- c(class(os_selected$checked), "formula")
   
@@ -807,7 +823,15 @@ selected_samples <- selected_aliquots_df(clin_specs,
 df_send <- append_check_col(selected_samples = selected_samples,
                             os_position = tb_specimen_df,
                             ppid_col = "ppid",
-                            specimen_id_col = "specimen_label")
+                            specimen_id_col = "specimen_label",
+                            os_required_cols = c("ppid",
+                                                 "Specimen_Specimen Label",
+                                                 "Specimen_Type", 
+                                                 "Specimen_Requirement Name", 
+                                                 "Specimen_Barcode",
+                                                 "Specimen_Container Name", 
+                                                 "Specimen_Container Position",
+                                                 "Scanned_barcode"))
 
 df_send
 ```
@@ -828,6 +852,7 @@ test_that("append_check_col works", {
 #' Save the selected aliquots with the check column data set in excel 
 #'
 #' @param file_path The location to save your file as .xlsx
+#' @param save_file Logical to save file in 
 #' @param ...  arguments taken by findBiobankR::append_check_col
 #' @importFrom tools file_ext
 #' @importFrom openxlsx write.xlsx
@@ -835,20 +860,26 @@ test_that("append_check_col works", {
 #' 
 #' @export
 
-process_save_selected_aliquots <- function(file_path, ...){
+process_save_selected_aliquots <- function(file_path = NULL, save_file= FALSE, ...){
   
-  dir_name = dirname(file_path)
-  
-  if(isFALSE(dir.exists(dir_name))) {
+  if(!is.null(file_path)){
     
-    stop(sprintf("The folder (%s) does not exist, Please check you file path", dir_name))
-  } 
-  
-  file_extension = file_ext(file_path)
-  
-  if(file_extension != "xlsx"){
+    stopifnot( "save_file option should be TRUE when file_path is provided" = isTRUE(save_file))
+    dir_name = dirname(file_path)
     
-    stop("The extension of the file is not an excel file")
+    if(isFALSE(dir.exists(dir_name))) {
+      
+      stop(sprintf("The folder (%s) does not exist, Please check you file path", dir_name))
+    } 
+    
+    file_extension = file_ext(file_path)
+    
+    if(file_extension != "xlsx"){
+      
+      stop("The extension of the file is not an excel file")
+      
+    }
+    
     
   }
   
@@ -856,10 +887,22 @@ process_save_selected_aliquots <- function(file_path, ...){
   selected_aliquots <- append_check_col(...)
   
   
-  message(sprintf("Saving the selected data frame in %s", file_path))
   
-  write.xlsx(selected_aliquots,
-             file = file_path )
+  
+  stopifnot("save_file option should be logical" = isTRUE(is.logical(save_file)))
+  
+  if(isFALSE(save_file)){
+    
+    message(sprintf("File not save. if you want to save please provide arguments file_path and save_file should be true"))
+   
+  }
+  
+  if(save_file){
+    message(sprintf("Saving the selected data frame in %s", file_path))
+    write.xlsx(selected_aliquots,
+               file = file_path ) 
+  }
+  
   return(selected_aliquots)
   
 }
@@ -902,10 +945,19 @@ dir.create(path_name)
 path_name <- file.path(path_name, "aliquots.xlsx")
 
 process_save_selected_aliquots(file_path = path_name,
+                               save_file= TRUE,
                                selected_samples = selected_samples,
                                os_position = tb_specimen_df,
                                ppid_col = "ppid",
-                               specimen_id_col = "specimen_label")
+                               specimen_id_col = "specimen_label",
+                               os_required_cols = c("ppid",
+                                                    "Specimen_Specimen Label",
+                                                    "Specimen_Type",
+                                                    "Specimen_Requirement Name", 
+                                                    "Specimen_Barcode",
+                                                    "Specimen_Container Name", 
+                                                    "Specimen_Container Position",
+                                                    "Scanned_barcode"))
 
 ```
   
@@ -973,7 +1025,7 @@ list_of_dfs <- list(df1, df2)
 sheet_names <- c("Sheet1", "Sheet2")
 
 #create temporary folder 
-path_name <- tempfile(pattern = "create_work_book") |>
+path_name <- tempfile(pattern = "create_work_book") %>%
   normalizePath(winslash = "/")
 
 dir.create(path_name)
@@ -995,7 +1047,176 @@ test_that("create_save_workbook works", {
   expect_true(inherits(create_save_workbook, "function")) 
 })
 ```
+
+
   
+  
+# gen_clinical_data
+    
+```{r function-gen_clinical_data}
+#' Provide a list of dfs with clinical samples and dictionary data set
+#' 
+#' This function processes clinical data set, lab data set and a dictionary. 
+#' 
+#' @param clinical_data Clinical data set
+#' @param clinical_cols  Clinical column names to cinclude 
+#' @param selected_samples_df aliquots to send ideally a data.frame from  findBiobankR::process_save_selected_aliquots or lab data specimen data
+#' @param specimen_cols Required columns from specimen data frame 
+#' @param dictionary Dictionary to provide to sample requester 
+#' @param ppid_col Participant id column A column that should be in `selected_samples_df` and `clinical_data` for merging 
+#' @param dict_variable dictionary variable name containing clinical cols 
+#' @param additional_data and Additiona data frame that should contain `ppid_col`
+#' @return A list of data.frames 
+#' @export
+gen_clinical_data <- function(clinical_data,
+                              clinical_cols,
+                              dictionary,
+                              selected_samples_df,
+                              ppid_col,
+                              dict_variable,
+                              specimen_cols = c("Participant_PPID", "Specimen_Barcode", "Specimen_Specimen Label"),
+                              additional_data = NULL ){
+  
+  setDT(clinical_data)
+  setDT(selected_samples_df)
+  setDT(selected_samples_df)
+  setDT(dictionary)
+  nms_clinical = names(clinical_data)
+  nms_selected_samples = names(selected_samples_df)
+  
+  if(isFALSE(all(specimen_cols %in% nms_selected_samples))){
+    
+    nms_missing = specimen_cols[!specimen_cols %in% nms_selected_samples] %>%
+      paste0(collapse = ",")
+    msg = sprintf("The following required column names were not found  %s in selected_samples_df", nms_missing)
+    stop(msg)
+    
+  }
+  
+  if(isFALSE(all(nms_clinical %in% nms_clinical))){
+    
+    nms_missing = nms_clinical[!nms_clinical %in% nms_clinical] %>%
+      paste0(collapse = ",")
+    msg = sprintf("The following required column name %s were not found in clinical_data", nms_missing)
+    stop(msg)
+    
+  }
+  
+  if (!(ppid_col %in%nms_clinical ) || !(ppid_col %in% nms_selected_samples)) {
+    stop("ppid_col is not present in both clinical_data and selected_samples_df")
+    
+    
+    
+  }
+  clinical_data <- merge(selected_samples_df,
+                         clinical_data, by = ppid_col ) 
+  
+  if(isFALSE(is.null(additional_data))){
+    
+    nms_additional = names(additional_data)
+    
+    if (!(ppid_col %in%nms_additional)) {
+      
+      stop("ppid_col is not present in the additional data set")
+    }
+    clinical_data <- merge(additional_data,
+                           clinical_data, by = ppid_col ) 
+    
+    
+  }
+  
+  all_cols = c(ppid_col, 
+               specimen_cols,
+               clinical_cols) %>% unique()
+  
+  clinical_data = clinical_data[, ..all_cols]
+  date_cols = clinical_data[, .SD, .SDcols = lubridate::is.Date] %>% names()
+  time_cols = clinical_data[, .SD, .SDcols = lubridate::is.timepoint] %>% names()
+  date_time_cols = c(date_cols, time_cols)
+  
+  if(length(date_time_cols) == 0){
+    
+    clinical_data[, (date_time_cols) := lapply(.SD, as.character), .SDcols = date_time_cols]
+  }
+  
+  
+  clinical_data[, (all_cols) := lapply(.SD, 
+                                       function(x) ifelse(x %in% c("Missing", "", "NA"),
+                                                          NA, x)), 
+                .SDcols = all_cols]
+  
+  #clinical_data[clinical_data == "Missing"] = NA
+  clinical_data <- rm_all_na_col(clinical_data)
+  nms_clinical_data <- names(clinical_data)
+  dictionary <- dictionary[get(dict_variable) %in%nms_clinical_data ]
+  
+  list(clinical_data = clinical_data, 
+       dictionary = dictionary,
+       samples_list = selected_samples_df )
+}
+
+
+
+```
+  
+```{r example-gen_clinical_data}
+library(data.table)
+library(dplyr)
+data("tb_data", package = "findBiobankR")
+data("tb_specimen_df", package = "findBiobankR")
+data("tb_dictionary", package = "findBiobankR")
+# required clinical cols
+clinical_cols <- c("tb_group", "hiv_status", "sex", "country") 
+
+clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
+                                     specimen_df = tb_specimen_df, 
+                                     join_by_col = "ppid",
+                                     specimen_col ="specimen_type" ,
+                                     clinical_vars = clinical_cols ,
+                                     specimen_label_col = "specimen_label",
+                                     os_aliquot_names = c("Serum", "Plasma")
+)
+
+
+clin_specs[1:4, serum_aliquot := select_one_aliquot(NP_labels_serum, aliquot_number = 1 )]
+clin_specs[1:4, plasma_aliquot := select_one_aliquot(NP_labels_plasma, aliquot_number= 1 )]
+
+
+selected_samples <- selected_aliquots_df(clin_specs,
+                                         aliquot_cols = c("serum_aliquot","plasma_aliquot"),
+                                         ppid_col = "ppid")
+
+selected_samples_df <- process_save_selected_aliquots(file_path = NULL,
+                               save_file= FALSE,
+                               selected_samples = selected_samples,
+                               os_position = tb_specimen_df,
+                               ppid_col = "ppid",
+                               specimen_id_col = "specimen_label",
+                               os_required_cols = c("ppid",
+                                                    "Specimen_Specimen Label",
+                                                    "Specimen_Type",
+                                                    "Specimen_Requirement Name", 
+                                                    "Specimen_Barcode",
+                                                    "Specimen_Container Name", 
+                                                    "Specimen_Container Position",
+                                                    "Scanned_barcode"))
+
+gen_clinical_data(clinical_data = tb_data,
+                  clinical_cols= clinical_cols,
+                  dictionary = tb_dictionary,
+                  selected_samples_df = selected_samples_df,
+                  ppid_col = "ppid",
+                  dict_variable = "variable_name",
+                  specimen_cols = c("ppid", "Specimen_Specimen Label", "Specimen_Type"),
+                  additional_data = NULL )
+
+```
+  
+```{r tests-gen_clinical_data}
+test_that("gen_clinical_data works", {
+  expect_true(inherits(gen_clinical_data, "function")) 
+})
+```
 
 ```{r development-load}
   # Load already included functions if relevant

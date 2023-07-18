@@ -6,11 +6,10 @@
 #' Data set from Open specimen normally come with very programming unfriendly column
 #' names with repeat suffixes # and so on this function attempts to correct this
 #' 
-#' @param names_os_df column names from Open specimen data
+#' @param names_os_df column names from Open specimen data or Open Specimen data.frame
 #' @importFrom stringr str_trim str_split
 #' @importFrom janitor make_clean_names
-#' @return A character vector of names
-#' 
+#' @return A character vector of names or data.frame
 #' @export
 #' @examples
 #'
@@ -23,11 +22,19 @@
 #'
 #' make_clean_os_names(nms_os)
 make_clean_os_names <- function(names_os_df){
-   
-   
+  
+  UseMethod("make_clean_os_names", names_os_df)
+  
+  }
+
+#' @export
+make_clean_os_names.default <- function(names_os_df){
+  
+  stopifnot("names_os_df should be a character vector"=is.character(names_os_df))
+  
   nms_break = make_clean_names(names_os_df) %>%
     str_trim
-
+  
   
   split_nms <- lapply(nms_break,  str_split, "_")
   
@@ -53,3 +60,14 @@ make_clean_os_names <- function(names_os_df){
   
   new_names
 }
+
+
+#' @export
+
+make_clean_os_names.data.frame <- function(names_os_df){
+  
+  nms = names(names_os_df)
+  nms_new = make_clean_os_names(nms)
+  setnames(names_os_df, nms, nms_new )
+}
+

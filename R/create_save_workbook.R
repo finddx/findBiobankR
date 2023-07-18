@@ -24,7 +24,7 @@
 #' sheet_names <- c("Sheet1", "Sheet2")
 #'
 #' #create temporary folder 
-#' path_name <- tempfile(pattern = "create_work_book") |>
+#' path_name <- tempfile(pattern = "create_work_book") %>%
 #'   normalizePath(winslash = "/")
 #'
 #' dir.create(path_name)
