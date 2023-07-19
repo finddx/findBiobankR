@@ -5,13 +5,13 @@
 \title{Append excel if condition}
 \usage{
 append_check_col(
-  selected_samples = NULL,
+  selected_samples,
   os_position,
   ppid_col = "Participant_PPID",
   specimen_id_col = "specimen_label",
-  os_required_cols = c("Specimen_Specimen Label", "Specimen_Type",
+  os_required_cols = c("Participant_PPID", "Specimen_Specimen Label", "Specimen_Type",
     "Specimen_Requirement Name", "Specimen_Barcode", "Specimen_Container Name",
-    "Specimen_Container Position"),
+    "Specimen_Container Position", "Scanned_barcode"),
   scanned_bar_code_col = "Scanned_barcode"
 )
 }
@@ -69,7 +69,15 @@ selected_samples <- selected_aliquots_df(clin_specs,
 df_send <- append_check_col(selected_samples = selected_samples,
                             os_position = tb_specimen_df,
                             ppid_col = "ppid",
-                            specimen_id_col = "specimen_label")
+                            specimen_id_col = "specimen_label",
+                            os_required_cols = c("ppid",
+                                                 "Specimen_Specimen Label",
+                                                 "Specimen_Type", 
+                                                 "Specimen_Requirement Name", 
+                                                 "Specimen_Barcode",
+                                                 "Specimen_Container Name", 
+                                                 "Specimen_Container Position",
+                                                 "Scanned_barcode"))
 
 df_send
 }

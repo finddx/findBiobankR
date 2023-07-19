@@ -13,12 +13,14 @@ Imports:
     DT,
     glue,
     janitor,
+    lubridate,
     magrittr,
     openxlsx,
     purrr,
     readxl,
     rlang (>= 0.4.11),
     stringr,
+    tidyr,
     tools,
     utils
 Suggests: 

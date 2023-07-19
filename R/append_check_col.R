@@ -49,7 +49,15 @@
 #' df_send <- append_check_col(selected_samples = selected_samples,
 #'                             os_position = tb_specimen_df,
 #'                             ppid_col = "ppid",
-#'                             specimen_id_col = "specimen_label")
+#'                             specimen_id_col = "specimen_label",
+#'                             os_required_cols = c("ppid",
+#'                                                  "Specimen_Specimen Label",
+#'                                                  "Specimen_Type", 
+#'                                                  "Specimen_Requirement Name", 
+#'                                                  "Specimen_Barcode",
+#'                                                  "Specimen_Container Name", 
+#'                                                  "Specimen_Container Position",
+#'                                                  "Scanned_barcode"))
 #'
 #' df_send
 
@@ -61,33 +69,27 @@
 #                   "specimen_label", "specimen_barcode", "specimen_container_name", 
 #                   "specimen_container_position", "scanned_barcode")
 
-
-append_check_col <- function(selected_samples = NULL,
+append_check_col <- function(selected_samples,
                              os_position,
                              ppid_col = "Participant_PPID",
                              specimen_id_col = "specimen_label",
-                             os_required_cols = c("Specimen_Specimen Label",
-                                                  "Specimen_Type", "Specimen_Requirement Name", 
-                                                  "Specimen_Barcode","Specimen_Container Name", 
-                                                  "Specimen_Container Position"),
+                             os_required_cols = c("Participant_PPID",
+                                                  "Specimen_Specimen Label",
+                                                  "Specimen_Type", 
+                                                  "Specimen_Requirement Name", 
+                                                  "Specimen_Barcode",
+                                                  "Specimen_Container Name", 
+                                                  "Specimen_Container Position",
+                                                  "Scanned_barcode"),
                              scanned_bar_code_col = "Scanned_barcode"){
   
   
   join_by_col = c(ppid_col, specimen_id_col)
   object_size = object.size(os_position)
   os_position[, (scanned_bar_code_col) := ""]
-  nms_os = names(os_position)
-  #nms_os = nms_os[nms_os %in% join_by_col]
-  nms_os_c = make_clean_os_names(nms_os)
   
-  setnames(os_position, old = nms_os, new = nms_os_c)
   
-  join_by_col_neg = join_by_col[join_by_col %in% os_required_cols]
-  required_cols = c(os_required_cols, 
-                    scanned_bar_code_col) %>%
-    unique()
-  
-  nms_old_pos = make_clean_os_names(required_cols)
+  nms_old_pos = make_clean_os_names(os_required_cols)
   
   if(isFALSE(is.null(selected_samples))){
     
@@ -101,6 +103,9 @@ append_check_col <- function(selected_samples = NULL,
     
   }
   
+  make_clean_os_names(os_selected)
+  
+  nms_os_c = names(os_selected)
   
   if(isFALSE(all(nms_old_pos %in% nms_os_c))){
     
@@ -112,8 +117,9 @@ append_check_col <- function(selected_samples = NULL,
   }
   
   setDT(os_selected)
-  #os_selected[, scanned_barcode := ""]
-  nms_old_pos_2 <- c(ppid_col, nms_old_pos) %>% unique()
+  
+  
+  
   os_selected <- os_selected[, ..nms_old_pos]
   os_selected[, specimen_barcode := gsub("^0","", specimen_barcode) ]
   os_selected[, specimen_barcode := paste0("0", specimen_barcode) ]
@@ -132,7 +138,7 @@ append_check_col <- function(selected_samples = NULL,
   
   os_selected[, specimen_barcode := fifelse(specimen_barcode == "0", specimen_label,specimen_barcode ) ]
   
-  setnames(os_selected, nms_old_pos, required_cols)
+  setnames(os_selected, nms_old_pos, os_required_cols)
   
   class(os_selected$checked) <- c(class(os_selected$checked), "formula")
   

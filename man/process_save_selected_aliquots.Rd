@@ -4,10 +4,12 @@
 \alias{process_save_selected_aliquots}
 \title{Save selected aliquots as excel}
 \usage{
-process_save_selected_aliquots(file_path, ...)
+process_save_selected_aliquots(file_path = NULL, save_file = FALSE, ...)
 }
 \arguments{
 \item{file_path}{The location to save your file as .xlsx}
+
+\item{save_file}{Logical to save file in}
 
 \item{...}{arguments taken by findBiobankR::append_check_col}
 }
@@ -54,9 +56,18 @@ dir.create(path_name)
 path_name <- file.path(path_name, "aliquots.xlsx")
 
 process_save_selected_aliquots(file_path = path_name,
+                               save_file= TRUE,
                                selected_samples = selected_samples,
                                os_position = tb_specimen_df,
                                ppid_col = "ppid",
-                               specimen_id_col = "specimen_label")
+                               specimen_id_col = "specimen_label",
+                               os_required_cols = c("ppid",
+                                                    "Specimen_Specimen Label",
+                                                    "Specimen_Type",
+                                                    "Specimen_Requirement Name", 
+                                                    "Specimen_Barcode",
+                                                    "Specimen_Container Name", 
+                                                    "Specimen_Container Position",
+                                                    "Scanned_barcode"))
 
 }

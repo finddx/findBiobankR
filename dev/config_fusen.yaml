@@ -5,10 +5,12 @@ biobank_reports.Rmd:
   - R/any_pos_any_neg.R
   - R/data_table.R
   - R/read_multiple_sheets.R
+  - R/rm_all_na_col.R
   tests:
   - tests/testthat/test-data_table.R
   - tests/testthat/test-read_multiple_sheets.R
   - tests/testthat/test-any_pos_any_neg.R
+  - tests/testthat/test-rm_all_na_col.R
   vignettes: vignettes/biobank-reports.Rmd
   inflate:
     flat_file: dev/biobank_reports.Rmd
@@ -24,8 +26,10 @@ sample_selections.Rmd:
   - R/append_check_col.R
   - R/convert_os_df_to_wide.R
   - R/create_save_workbook.R
+  - R/gen_clinical_data.R
   - R/make_clean_os_names.R
   - R/process_save_selected_aliquots.R
+  - R/samples_distributed_summary.R
   - R/select_many_aliquots.R
   - R/select_one_aliquot.R
   - R/selected_aliquots_df.R
@@ -38,6 +42,8 @@ sample_selections.Rmd:
   - tests/testthat/test-append_check_col.R
   - tests/testthat/test-process_save_selected_aliquots.R
   - tests/testthat/test-create_save_workbook.R
+  - tests/testthat/test-gen_clinical_data.R
+  - tests/testthat/test-samples_distributed_summary.R
   vignettes: vignettes/sample-selections-vignette.Rmd
   inflate:
     flat_file: dev/sample_selections.Rmd

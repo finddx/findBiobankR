@@ -7,10 +7,10 @@
 make_clean_os_names(names_os_df)
 }
 \arguments{
-\item{names_os_df}{column names from Open specimen data}
+\item{names_os_df}{column names from Open specimen data or Open Specimen data.frame}
 }
 \value{
-A character vector of names
+A character vector of names or data.frame
 }
 \description{
 Data set from Open specimen normally come with very programming unfriendly column
