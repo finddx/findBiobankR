@@ -20,6 +20,7 @@ Imports:
     readxl,
     rlang (>= 0.4.11),
     stringr,
+    tidyr,
     tools,
     utils
 Suggests: 

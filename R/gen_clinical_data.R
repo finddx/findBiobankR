@@ -120,9 +120,13 @@ gen_clinical_data <- function(clinical_data,
                            clinical_data, by = ppid_col ) 
     
     
+  }else{
+    
+    nms_additional = NULL
   }
   
-  all_cols = c(ppid_col, 
+  all_cols = c(nms_additional,
+               ppid_col, 
                specimen_cols,
                clinical_cols) %>% unique()
   
