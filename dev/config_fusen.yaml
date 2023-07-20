@@ -4,6 +4,7 @@ biobank_reports.Rmd:
   R:
   - R/any_pos_any_neg.R
   - R/data_table.R
+  - R/read_multiple_files.R
   - R/read_multiple_sheets.R
   - R/rm_all_na_col.R
   tests:
@@ -11,6 +12,7 @@ biobank_reports.Rmd:
   - tests/testthat/test-read_multiple_sheets.R
   - tests/testthat/test-any_pos_any_neg.R
   - tests/testthat/test-rm_all_na_col.R
+  - tests/testthat/test-read_multiple_files.R
   vignettes: vignettes/biobank-reports.Rmd
   inflate:
     flat_file: dev/biobank_reports.Rmd
