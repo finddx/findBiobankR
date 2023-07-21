@@ -59,7 +59,11 @@ tb_specimen_df <- data.table(specimen_label = specimen_labels)
 clinical_df <- data.table(ppid = ids_final)
 
 
-
+c("Participant_PPID", "Participant_Registration Site", "Participant_Gender",
+  "Visit_Visit Site", "Visit_Visit Date", "Visit_Name", "Visit_Event Label",
+  "Specimen_Specimen Label", "Specimen_Type", "Specimen_Initial Quantity",
+  "Specimen_Available Quantity", "Specimen_Requirement Name", "Collection Protocol_Short Title"
+)
 sex <- c("Female", "Male")
 
 list_cols <- list(tb_group=tb_groups,
@@ -122,12 +126,12 @@ tb_specimen_df[, specimen_container_name := "ZMC100"]
 tb_specimen_df[, specimen_container_position := as.integer(gl(.N, 81, .N))]
 tb_specimen_df[, specimen_container_name := paste0(specimen_container_name, specimen_container_position)]
 
-
 usethis::use_data(tb_specimen_df, overwrite = TRUE)
+
 
 checkhelper::use_data_doc("tb_specimen_df")
 
-
+openxlsx::write.xlsx(tb_specimen_df, file = "tb_specimen_df.xlsx")
 tb_df <- merge(tb_data,
                tb_specimen_df,
                by = "ppid",
