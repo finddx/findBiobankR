@@ -682,6 +682,59 @@ test_that("del_repeat_os_names works", {
   expect_true(inherits(make_clean_os_names, "function")) 
 })
 ```
+
+# read_os_data
+    
+```{r function-read_os_data}
+#' Read Open Specimen data.frame in R
+#' 
+#' @description
+#' A function to read Open Specimen data. The need comes from the fact that this function standadizes names
+#' 
+#' @param path_name Path to OS data
+#' @param header_true Whether the file has a header defaults to false
+#' @param ... Other parameters taken by data.table::fread
+#' @importFrom data.table fread setnames
+#' @return data.table
+#' 
+#' @export
+read_os_data <- function(path_name,
+                         header_true = FALSE,
+                         ...){
+  
+  df = fread(path_name,
+             sep = ",",
+             header = header_true,
+             fill = T, ...)
+  
+  empty_row = which(grepl("^$", df$V1))
+  header_row = empty_row + 1
+  
+  new_nms = df[header_row, ] %>%
+    as.character() %>%
+    make_clean_os_names()
+  
+  old_nms = names(df)
+  df <- df[-c(1:header_row)]
+  setnames(df, old = old_nms,
+           new = new_nms)
+  df
+  
+}
+```
+  
+```{r example-read_os_data}
+tb_specs <- system.file("extdata", "tb_specs.csv",
+                          package = "findBiobankR")
+read_os_data(path_name = tb_specs)
+```
+  
+```{r tests-read_os_data}
+test_that("read_os_data works", {
+  expect_true(inherits(read_os_data, "function")) 
+})
+```
+  
   
 # append_check_col
     
