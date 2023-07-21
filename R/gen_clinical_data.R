@@ -135,7 +135,7 @@ gen_clinical_data <- function(clinical_data,
   time_cols = clinical_data[, .SD, .SDcols = lubridate::is.timepoint] %>% names()
   date_time_cols = c(date_cols, time_cols)
   
-  if(length(date_time_cols) == 0){
+  if(isFALSE(length(date_time_cols) == 0)){
     
     clinical_data[, (date_time_cols) := lapply(.SD, as.character), .SDcols = date_time_cols]
   }
