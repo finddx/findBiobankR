@@ -465,6 +465,8 @@ read_multiple_files <- function(folder_path,
   
   file_names_clean <- make_clean_names(file_names)
   
+  file_names_clean <- gsub(paste0("_", extesions, "$"), "",file_names_clean)
+  
   possibly_read <- possibly(read_function, otherwise = NULL)
   
   list_of_files <- lapply(file_paths, function(x){
