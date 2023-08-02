@@ -1031,14 +1031,14 @@ test_that("process_save_selected_aliquots works", {
 #' @param list_of_dfs A list of data frames to write to the workbook.
 #' @param path_name The path to the Excel workbook to create.
 #' @param sheet_names A character vector of names for the sheets in the workbook.
-#'
-#' @return The workbook object.
-#'
+#' @param over_write A Logical value	If TRUE, overwrite any existing file
+#' 
+#' @return Writes file to provided path.
 #' @importFrom openxlsx createWorkbook addWorksheet writeData saveWorkbook
 #' @importFrom data.table setDF
 #'
 #' @export
-create_save_workbook  <- function(list_of_dfs, path_name, sheet_names) {
+create_save_workbook  <- function(list_of_dfs, path_name, sheet_names, over_write = FALSE) {
   
   # Check the input arguments for validity
   stopifnot(is.list(list_of_dfs) && all(sapply(list_of_dfs, is.data.frame)))
@@ -1061,7 +1061,7 @@ create_save_workbook  <- function(list_of_dfs, path_name, sheet_names) {
   })
   
   # Save the workbook
-  saveWorkbook(wb, file = path_name)
+  saveWorkbook(wb, file = path_name, overwrite = over_write)
   
   # Return the workbook object
   invisible(wb)
