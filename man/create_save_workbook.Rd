@@ -4,7 +4,7 @@
 \alias{create_save_workbook}
 \title{Save a list of data frames to excel file}
 \usage{
-create_save_workbook(list_of_dfs, path_name, sheet_names)
+create_save_workbook(list_of_dfs, path_name, sheet_names, over_write = FALSE)
 }
 \arguments{
 \item{list_of_dfs}{A list of data frames to write to the workbook.}
@@ -12,9 +12,11 @@ create_save_workbook(list_of_dfs, path_name, sheet_names)
 \item{path_name}{The path to the Excel workbook to create.}
 
 \item{sheet_names}{A character vector of names for the sheets in the workbook.}
+
+\item{over_write}{A Logical value    If TRUE, overwrite any existing file}
 }
 \value{
-The workbook object.
+Writes file to provided path.
 }
 \description{
 Given a list of data.frames save this
