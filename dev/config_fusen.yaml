@@ -7,12 +7,14 @@ biobank_reports.Rmd:
   - R/read_multiple_files.R
   - R/read_multiple_sheets.R
   - R/rm_all_na_col.R
+  - R/summarise_categorical_vars.R
   tests:
   - tests/testthat/test-data_table.R
   - tests/testthat/test-read_multiple_sheets.R
   - tests/testthat/test-any_pos_any_neg.R
   - tests/testthat/test-rm_all_na_col.R
   - tests/testthat/test-read_multiple_files.R
+  - tests/testthat/test-summarise_categorical_vars.R
   vignettes: vignettes/biobank-reports.Rmd
   inflate:
     flat_file: dev/biobank_reports.Rmd
