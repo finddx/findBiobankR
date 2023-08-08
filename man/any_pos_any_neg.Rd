@@ -8,7 +8,7 @@ any_pos_any_neg(
   df,
   test_cols,
   test_type,
-  neg_value = "No",
+  neg_value = NULL,
   pos_value = "Yes",
   id_cols = c("Participant_PPID")
 )
