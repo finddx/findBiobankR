@@ -1189,7 +1189,7 @@ gen_clinical_data <- function(clinical_data,
   clinical_data = clinical_data[, ..all_cols]
   date_cols = clinical_data[, .SD, .SDcols = lubridate::is.Date] %>% names()
   time_cols = clinical_data[, .SD, .SDcols = lubridate::is.timepoint] %>% names()
-  date_time_cols = c(date_cols, time_cols)
+  date_time_cols = c(date_cols, time_cols) %>% unique()
   
   if(isFALSE(length(date_time_cols) == 0)){
     
