@@ -137,7 +137,7 @@ kable(head(tb_resp_symptoms, 5))
 outcome_df  <- any_pos_any_neg(df = tb_resp_symptoms, 
                  test_cols =respirotory_symptoms ,
                  test_type = "resp_symp" ,
-                 neg_value ="No",
+                # neg_value ="No",
                  pos_value = "Yes",
                  id_cols ="ID")
 kable(head(outcome_df, 5))

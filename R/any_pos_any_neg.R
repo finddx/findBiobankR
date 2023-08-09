@@ -29,46 +29,52 @@
 any_pos_any_neg <-  function(df, 
                              test_cols,
                              test_type ,
-                             neg_value ="No",
+                             neg_value =NULL,
                              pos_value = "Yes",
                              id_cols =c("Participant_PPID") ){
   
   
   if(isFALSE(inherits(df, "data.table"))){
     
-      setDT(df)
+    setDT(df)
   }
   
-   if(isFALSE(length(test_type) == 1)){
+  if(isFALSE(length(test_type) == 1)){
     
-      stop("test_type should be a vector of length one")
+    stop("test_type should be a vector of length one")
   }
-
-
+  
+  
   df[, (test_cols) := lapply(.SD, function(x) ifelse(is.na(x), "", x)), .SDcols = test_cols]
-
-  any_neg = paste0(test_type, "_any_neg")
+  
+  any_neg = NULL
+  neg_no = NULL
   any_pos = paste0(test_type, "_any_pos")
   pos_no = paste0(test_type, "_pos_no")
-  neg_no = paste0(test_type, "_neg_no")
+  
   
   row_nums = seq_len(nrow(df))
   
-  cols_interest <- c(id_cols,any_neg,
-                     any_pos,  pos_no,
-                     neg_no)
+  
   
   df[, (any_pos) := any(.SD== pos_value), .SDcols = test_cols , by = row_nums]
-  
-  df[, (any_neg) := any(.SD== neg_value), .SDcols = test_cols , by = row_nums]
   
   
   df[, (pos_no) :=sum(.SD ==pos_value), .SDcols = test_cols, by = row_nums]
   
+  if(!is.null(neg_value)){
+    
+    any_neg = paste0(test_type, "_any_neg")
+    neg_no = paste0(test_type, "_neg_no")
+    df[, (any_neg) := any(.SD== neg_value), .SDcols = test_cols , by = row_nums]
+    df[, (neg_no) :=sum(.SD == neg_value), .SDcols = test_cols, by = row_nums]
+    
+    
+  }
+  cols_interest <- c(id_cols,any_neg,
+                     any_pos,  pos_no,
+                     neg_no)
+  df2 <- df[, .SD, .SDcols = cols_interest]
   
-  df[, (neg_no) :=sum(.SD == neg_value), .SDcols = test_cols, by = row_nums]
-  
-  df <- df[, .SD, .SDcols = cols_interest]
-  
-  df
+  df2
 }
