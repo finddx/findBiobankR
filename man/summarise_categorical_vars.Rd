@@ -40,8 +40,8 @@ data("tb_data", package = "findBiobankR")
 summarise_categorical_vars(df = tb_data,
                            by_vec = c("tb_group", "country"),
                            names_from_var ="country",
-                           setordr_col = "country",
-                           names_from_sort ="country" ,
+                           setordr_col = "tb_group",
+                           names_from_sort =NULL ,
                            return_wide = TRUE,
                            add_totals_where = c("row", "col"))
 }
