@@ -4,10 +4,12 @@
 \alias{read_multiple_sheets}
 \title{Read Sheets  From excel workbook}
 \usage{
-read_multiple_sheets(file_path, ...)
+read_multiple_sheets(file_path, xl_sheets = NULL, ...)
 }
 \arguments{
 \item{file_path}{path to file}
+
+\item{xl_sheets}{excel sheets in the workbook}
 
 \item{...}{Other parameters from read excel function}
 }
