@@ -5,7 +5,9 @@
 #' Read Files From excel workbook 
 #' 
 #' @param file_path path to file  
+#' @param xl_sheets excel sheets in the workbook
 #' @param ... Other parameters from read excel function 
+#' @param r_bind Logical whether to return a list or a single data frame through rbind
 #' @return returns a list of data frames 
 #' @importFrom readxl read_excel excel_sheets
 #' @importFrom data.table setDT 
@@ -23,7 +25,7 @@
 #' iris_list <- read_multiple_sheets(file_path  = iris_species ) %>% 
 #'   lapply(head, 4)
 #' iris_list
-read_multiple_sheets <- function(file_path, ...){
+read_multiple_sheets <- function(file_path, xl_sheets = NULL, r_bind = FALSE, ...){
     
     
     if(isFALSE(file.exists(file_path))) {
@@ -39,20 +41,51 @@ read_multiple_sheets <- function(file_path, ...){
         
     }
     
-    xl_sheets <- excel_sheets(file_path)
+     xl_sheets_file <- excel_sheets(file_path)
+     
+    if(is.null(xl_sheets)){
+      
+      xl_sheets <-xl_sheets_file
+    }else{
+      
+      sheets_in_wb <- xl_sheets %in% xl_sheets_file
+      
+      if(!all(sheets_in_wb)){
+        
+        missing_sheets <- xl_sheets[sheets_in_wb] %>%
+          paste0(collapse = ", ")
+        
+        missing_sheets_msg <- sprintf("The following excel sheets %s are missing", missing_sheets)
+        
+        stop(missing_sheets_msg)
+        
+      }
+    }
+    
     
     xl_sheets_clean <- make_clean_names(xl_sheets)
     
     possi_excel <- possibly(read_excel, otherwise = NULL)
     
     list_of_files <- lapply(xl_sheets, function(x){
+      
+      df = possi_excel(file_path, sheet = x, ...) %>%
         
-        possi_excel(file_path, sheet = x, ...) %>%
-
-      setDT()
-        
+        setDT()
+      
+      df[, sheet_name := x]
+      df
     })%>% set_names(xl_sheets_clean)
     
-   
+    return_value = list_of_files
     
+    if(r_bind){
+      
+      dt = data.table::rbindlist(list_of_files,
+                                 use.names = TRUE, 
+                                 fill = TRUE)
+      return_value = dt
+    }
+   
+    return(return_value)
 }

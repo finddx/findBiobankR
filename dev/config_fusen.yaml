@@ -4,7 +4,11 @@ biobank_reports.Rmd:
   R:
   - R/any_pos_any_neg.R
   - R/data_table.R
+  - R/get_aliquot_number.R
+  - R/get_event_id.R
   - R/get_find_study_id.R
+  - R/get_site_id.R
+  - R/get_specimen_type_id.R
   - R/read_multiple_files.R
   - R/read_multiple_sheets.R
   - R/rm_all_na_col.R
@@ -17,6 +21,10 @@ biobank_reports.Rmd:
   - tests/testthat/test-read_multiple_files.R
   - tests/testthat/test-summarise_categorical_vars.R
   - tests/testthat/test-get_find_study_id.R
+  - tests/testthat/test-get_site_id.R
+  - tests/testthat/test-get_event_id.R
+  - tests/testthat/test-get_specimen_type_id.R
+  - tests/testthat/test-get_aliquot_number.R
   vignettes: vignettes/biobank-reports.Rmd
   inflate:
     flat_file: dev/biobank_reports.Rmd

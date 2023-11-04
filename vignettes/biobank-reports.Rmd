@@ -50,6 +50,7 @@ data_table(df,
     
 
   
+  
 
 ```{r example-read_multiple_sheets}
 iris_species <- system.file("extdata", "iris_species.xlsx",
@@ -172,6 +173,72 @@ ppid <- c("TB002133530", "TB032020154",
           "TB001200533", "TB001035037", 
           "TB002133927")
 study_id <- get_find_study_id(ppid)
+
+```
+
+  
+
+  
+  
+
+# get_site_id
+
+    
+
+  
+
+```{r example-get_site_id}
+get_site_id("PP007019990")
+```
+
+  
+
+  
+
+# get_event_id
+
+    
+
+  
+
+```{r example-get_event_id}
+
+get_event_id("PP0070199910001001")
+
+```
+
+  
+
+  
+
+  
+
+# get_specimen_type_id
+
+    
+
+  
+
+```{r example-get_specimen_type_id}
+
+get_specimen_type_id("PP0070199910001001")
+
+```
+
+  
+
+  
+
+# get_aliquot_number
+
+    
+
+  
+
+```{r example-get_aliquot_number}
+
+get_aliquot_number("PP0070199910001001")
+
 
 ```
 
