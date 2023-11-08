@@ -1,0 +1,256 @@
+---
+title: "flat_my_fun.Rmd empty"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r development, include=FALSE}
+library(testthat)
+```
+
+```{r development-load}
+# Load already included functions if relevant
+pkgload::load_all(export_all = FALSE)
+```
+
+# auth_os
+    
+```{r function-auth_os}
+#' Authenticate to the OpenSpecimen API
+#'
+#' This function authenticates a user to the OpenSpecimen API using the provided
+#' URL, username, and password.
+#'
+#' @param url The URL of the OpenSpecimen API.
+#' @param username The username for authentication.
+#' @param password The password for authentication.
+#' @param domain_name The domain name (default is "openspecimen").
+#'
+#' @return A list with the URL and the authentication response which contains auth token and user details
+#' @importFrom httr POST  add_headers content status_code
+#' @note See additional information on this API on https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/1116035/REST+APIs
+#' @export
+#' 
+auth_os <- function(url ,
+                    username,
+                    password, 
+                    domain_name = "openspecimen") {
+    # Define the login request data as a JSON object
+    sessions_url <- paste0(url, "/sessions")
+    
+    login <- list(
+        loginName = username,
+        password = password,
+        domainName = domain_name
+    )
+    
+    # Specify the content type as JSON in the header
+    headers <- add_headers("Content-Type" = "application/json")
+    
+    # Make the POST request for authentication
+    response <- POST(
+        url = sessions_url,
+        body = login,
+        config = headers,
+        encode = "json"
+    )
+    
+    # Check the response status code
+    status_code <- status_code(response)
+    
+    if (status_code %in% c(200, 201)) {
+        # Authentication successful, return the response content
+        auth_res = content(response, "parsed")
+        return(list(url = url, auth_response = auth_res))
+        
+    } else {
+        # Authentication failed, return an error message or handle it as needed
+        error_message <- content(response, "text")
+        
+        stop(paste("Authentication failed with status code", status_code, ":", error_message))
+    }
+}
+
+```
+  
+```{r example-auth_os}
+
+os_test_url <- Sys.getenv("OSTESTURL")
+os_test_username <- Sys.getenv("OSUSERNAME")
+os_test_password <- Sys.getenv("OSPASSWORDTEST")
+
+auth_repo <- auth_os(url = os_test_url,
+                     username = os_test_username,
+                     password = os_test_password)
+
+```
+  
+
+```{r tests-auth_os}
+test_that("auth_os works", {
+  expect_true(inherits(auth_os, "function")) 
+})
+```
+  
+# parse_data
+    
+```{r function-parse_data}
+#' Parse Response Data
+#'
+#' This function parses the response data obtained from the OpenSpecimen API and
+#' organizes it into a data frame.
+#'
+#' @param response The response data to be parsed.
+#'
+#' @return A data frame containing the parsed data.
+#'
+#' @importFrom httr content
+#'
+#'
+#' @note Make sure to provide an HTTP response with the appropriate structure for parsing.
+#'
+#' @export
+parse_data <- function(response) {
+  
+  # Parse the content from the response
+  parsed_content_request <- content(response, as = "parsed")
+  
+  # Extract column names from the parsed content
+  col_nms <- parsed_content_request$columnLabels %>% unlist()
+  
+  # Clean and format column names
+  col_nms <- gsub("#", "", col_nms) %>% findBiobankR::make_clean_os_names()
+  
+  # Extract rows from the parsed content
+  myrows <- parsed_content_request$rows
+  
+  # Create a data frame from the rows
+  df <- lapply(myrows, function(x) {
+    rbind(x)
+  }) %>% data.table::rbindlist()
+  
+  # Set column names for the data frame
+  names(df) <- col_nms
+  
+  return(df)
+  
+}
+
+```
+  
+```{r example-parse_data}
+#parse_data()
+```
+  
+```{r tests-parse_data}
+test_that("parse_data works", {
+  expect_true(inherits(parse_data, "function")) 
+})
+```
+  
+# get_os_query
+    
+```{r function-get_os_query}
+#' Execute a Saved Query
+#'
+#' This function executes a saved query in the OpenSpecimen API using the provided
+#' authentication response and query ID. You can specify the parameters for the query
+#' such as driving form, wide row mode, start position, and maximum results.
+#'
+#' @param auth_response The authentication response obtained from `auth_os`.
+#' @param query_id The ID of the saved query to execute.
+#' @param driving_form The driving form for the query (default is "Specimen").
+#' @param wide_row_mode The wide row mode for the query (default is "OFF").
+#' @param start_at The starting position for the query (optional).
+#' @param max_results The maximum number of results to retrieve (optional).
+#'
+#' @return A data frame containing the results of the saved query.
+#'
+
+#' @import httr
+#' @importFrom httr POST add_headers status_code content
+#' @note See additional information on this API on https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/104529939/Query
+#' 
+#' @export
+get_os_query <- function(auth_response,
+                      query_id,
+                      driving_form = c("Specimen", "Participant"),
+                      wide_row_mode = c("OFF", "DEEP", "SHALLOW"),
+                      start_at = NULL,
+                      max_results = NULL) {
+  # Match the driving_form argument to one of the allowed values
+  driving_form <- match.arg(driving_form)
+  # Match the wide_row_mode argument to one of the allowed values
+  wide_row_mode <- match.arg(wide_row_mode)
+  # Extract the authentication token from the response
+  auth_token <- auth_response$auth_response$token
+  url <- auth_response$url
+  # Define the query request data
+  query_request <- list(
+    drivingForm = driving_form,
+    wideRowMode = wide_row_mode,
+    startAt = start_at,
+    maxResults = max_results
+  )
+
+  # Specify the content type as JSON in the header
+  headers <- add_headers(
+    "Content-Type" = "application/json",
+    "X-OS-API-TOKEN" = auth_token
+  )
+
+  # Make the POST request for the query
+  response <- POST(
+    url = paste0(url, "/query/", query_id),
+    body = query_request,
+    config = headers,
+    encode = "json"
+  )
+
+  # Check the response status code
+  status_code <- status_code(response)
+
+  if (status_code == 200) {
+    # Query successful, return the parsed response content
+    return(parse_data(response))
+
+  } else {
+    # Query failed, return an error message or handle it as needed
+    error_message <- content(response, "text")
+    stop(paste("Query failed with status code", status_code, ":", error_message))
+  }
+}
+
+```
+  
+```{r example-get_os_query}
+
+os_test_url <- Sys.getenv("OSTESTURL")
+os_test_username <- Sys.getenv("OSUSERNAME")
+os_test_password <- Sys.getenv("OSPASSWORDTEST")
+
+auth_repo <- auth_os(url = os_test_url,
+                     username = os_test_username,
+                     password = os_test_password)
+
+get_os_query(auth_repo, query_id = 114,
+             driving_form = "Specimen",
+             wide_row_mode = "OFF",
+             start_at = 0,
+             max_results = 5)
+```
+  
+```{r tests-get_os_query}
+test_that("get_os_query works", {
+  expect_true(inherits(get_os_query, "function")) 
+})
+```
+  
+
+```{r development-inflate, eval=FALSE}
+# Run but keep eval=FALSE to avoid infinite loop
+# Execute in the console directly
+fusen::inflate(flat_file = "dev/OpenSpecimenAPI.Rmd", vignette_name = "Open-Specimen-API")
+```
+

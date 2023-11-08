@@ -12,6 +12,7 @@ Imports:
     data.table,
     DT,
     glue,
+    httr,
     janitor,
     lubridate,
     magrittr,

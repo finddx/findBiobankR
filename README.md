@@ -311,3 +311,32 @@ read_multiple_files(folder_path =path_name ,
 |          7.1 |         3.0 |          5.9 |         2.1 | virginica |
 |          6.3 |         2.9 |          5.6 |         1.8 | virginica |
 |          6.5 |         3.0 |          5.8 |         2.2 | virginica |
+
+## Get OS Query
+
+``` r
+os_test_url <- Sys.getenv("OSTESTURL")
+os_test_username <- Sys.getenv("OSUSERNAME")
+os_test_password <- Sys.getenv("OSPASSWORDTEST")
+
+auth_response <- auth_os(url = os_test_url,
+                         username = os_test_username,
+                         password = os_test_password)
+
+
+query114 <- get_os_query(auth_response, query_id = 114,
+                         driving_form = "Participant",
+                         wide_row_mode = "OFF",
+                         start_at = 0,
+                         max_results = 5)
+
+kable(query114)
+```
+
+| specimen_label     | specimen_type         | specimen_requirement_name |
+|:-------------------|:----------------------|:--------------------------|
+| CV0010150000002    | Fluid - Not Specified | Oropharyngeal Swab        |
+| CV0010150000002001 | Fluid - Not Specified | Oropharyngeal Swab        |
+| CV0010150000002002 | Fluid - Not Specified | Oropharyngeal Swab        |
+| CV0010150000002003 | Fluid - Not Specified | Oropharyngeal Swab        |
+| CV0010150000002004 | Fluid - Not Specified | Oropharyngeal Swab        |

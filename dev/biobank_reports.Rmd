@@ -886,6 +886,48 @@ test_that("get_aliquot_number works", {
 })
 ```
   
+# get_patient_id
+    
+```{r function-get_patient_id}
+#' Extract Patient ID from FindDX Aliquot ID
+#'
+#' This function extracts the Patient ID from FindDX Aliquot IDs.
+#'
+#' @param x A character vector of FindDX Aliquot IDs.
+#' @return A character vector of extracted Patient IDs.
+#' @export
+#' 
+#'
+get_patient_id <- function(x) {
+  if (!is.character(x)) {
+    stop("Input must be a character vector.")
+  }
+  
+  if (any(nchar(x) != 18)) {
+    
+    warning("Some ID's do not have 18 characters. They are not standard FindDX aliquot IDs.")
+    
+  }
+  
+  patient_number <- str_extract(str_to_upper(x), "^[A-Z]{2}\\d{9}" )
+  
+  return(patient_number)
+}
+
+```
+  
+```{r example-get_patient_id}
+
+get_patient_id("PP0070199910001001")
+
+```
+  
+```{r tests-get_patient_id}
+test_that("get_patient_id works", {
+  expect_true(inherits(get_patient_id, "function")) 
+})
+```
+  
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
