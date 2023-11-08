@@ -7,6 +7,7 @@ biobank_reports.Rmd:
   - R/get_aliquot_number.R
   - R/get_event_id.R
   - R/get_find_study_id.R
+  - R/get_patient_id.R
   - R/get_site_id.R
   - R/get_specimen_type_id.R
   - R/read_multiple_files.R
@@ -25,10 +26,30 @@ biobank_reports.Rmd:
   - tests/testthat/test-get_event_id.R
   - tests/testthat/test-get_specimen_type_id.R
   - tests/testthat/test-get_aliquot_number.R
+  - tests/testthat/test-get_patient_id.R
   vignettes: vignettes/biobank-reports.Rmd
   inflate:
     flat_file: dev/biobank_reports.Rmd
     vignette_name: biobank-reports
+    open_vignette: true
+    check: true
+    document: true
+    overwrite: ask
+OpenSpecimenAPI.Rmd:
+  path: dev/OpenSpecimenAPI.Rmd
+  state: active
+  R:
+  - R/auth_os.R
+  - R/get_os_query.R
+  - R/parse_data.R
+  tests:
+  - tests/testthat/test-auth_os.R
+  - tests/testthat/test-parse_data.R
+  - tests/testthat/test-get_os_query.R
+  vignettes: vignettes/open-specimen-api.Rmd
+  inflate:
+    flat_file: dev/OpenSpecimenAPI.Rmd
+    vignette_name: Open-Specimen-API
     open_vignette: true
     check: true
     document: true

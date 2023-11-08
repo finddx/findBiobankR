@@ -206,3 +206,25 @@ read_multiple_files(folder_path =path_name ,
   })
 ```
 
+## Get OS Query
+
+```{r}
+os_test_url <- Sys.getenv("OSTESTURL")
+os_test_username <- Sys.getenv("OSUSERNAME")
+os_test_password <- Sys.getenv("OSPASSWORDTEST")
+
+auth_response <- auth_os(url = os_test_url,
+                         username = os_test_username,
+                         password = os_test_password)
+
+
+query114 <- get_os_query(auth_response, query_id = 114,
+                         driving_form = "Participant",
+                         wide_row_mode = "OFF",
+                         start_at = 0,
+                         max_results = 5)
+
+kable(query114)
+
+```
+

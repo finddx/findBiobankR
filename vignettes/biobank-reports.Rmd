@@ -246,4 +246,20 @@ get_aliquot_number("PP0070199910001001")
 
   
 
+# get_patient_id
+
+    
+
+  
+
+```{r example-get_patient_id}
+
+get_patient_id("PP0070199910001001")
+
+```
+
+  
+
+  
+
 
