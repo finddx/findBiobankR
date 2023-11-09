@@ -39,17 +39,17 @@ See additional information on this API on https://openspecimen.atlassian.net/wik
 }
 \examples{
 
-os_test_url <- Sys.getenv("OSTESTURL")
-os_test_username <- Sys.getenv("OSUSERNAME")
-os_test_password <- Sys.getenv("OSPASSWORDTEST")
-
-auth_repo <- auth_os(url = os_test_url,
-                     username = os_test_username,
-                     password = os_test_password)
-
-get_os_query(auth_repo, query_id = 114,
-             driving_form = "Specimen",
-             wide_row_mode = "OFF",
-             start_at = 0,
-             max_results = 5)
+# os_test_url <- Sys.getenv("OSTESTURL")
+# os_test_username <- Sys.getenv("OSUSERNAME")
+# os_test_password <- Sys.getenv("OSPASSWORDTEST")
+# 
+# auth_repo <- auth_os(url = os_test_url,
+#                      username = os_test_username,
+#                      password = os_test_password)
+# 
+# get_os_query(auth_repo, query_id = 114,
+#              driving_form = "Specimen",
+#              wide_row_mode = "OFF",
+#              start_at = 0,
+#              max_results = 5)
 }

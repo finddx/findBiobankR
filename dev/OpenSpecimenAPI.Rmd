@@ -76,13 +76,13 @@ auth_os <- function(url ,
   
 ```{r example-auth_os, eval=FALSE}
 
-os_test_url <- Sys.getenv("OSTESTURL")
-os_test_username <- Sys.getenv("OSUSERNAME")
-os_test_password <- Sys.getenv("OSPASSWORDTEST")
-
-auth_repo <- auth_os(url = os_test_url,
-                     username = os_test_username,
-                     password = os_test_password)
+# os_test_url <- Sys.getenv("OSTESTURL")
+# os_test_username <- Sys.getenv("OSUSERNAME")
+# os_test_password <- Sys.getenv("OSPASSWORDTEST")
+# 
+# auth_repo <- auth_os(url = os_test_url,
+#                      username = os_test_username,
+#                      password = os_test_password)
 
 ```
   
@@ -237,19 +237,19 @@ get_os_query <- function(auth_response,
   
 ```{r example-get_os_query, eval=FALSE}
 
-os_test_url <- Sys.getenv("OSTESTURL")
-os_test_username <- Sys.getenv("OSUSERNAME")
-os_test_password <- Sys.getenv("OSPASSWORDTEST")
-
-auth_repo <- auth_os(url = os_test_url,
-                     username = os_test_username,
-                     password = os_test_password)
-
-get_os_query(auth_repo, query_id = 114,
-             driving_form = "Specimen",
-             wide_row_mode = "OFF",
-             start_at = 0,
-             max_results = 5)
+# os_test_url <- Sys.getenv("OSTESTURL")
+# os_test_username <- Sys.getenv("OSUSERNAME")
+# os_test_password <- Sys.getenv("OSPASSWORDTEST")
+# 
+# auth_repo <- auth_os(url = os_test_url,
+#                      username = os_test_username,
+#                      password = os_test_password)
+# 
+# get_os_query(auth_repo, query_id = 114,
+#              driving_form = "Specimen",
+#              wide_row_mode = "OFF",
+#              start_at = 0,
+#              max_results = 5)
 ```
   
 ```{r tests-get_os_query}
@@ -331,15 +331,15 @@ get_bulk_query <- function(auth_response,
 ```{r example-get_bulk_query, eval=FALSE}
 
 
-auth_response <- auth_os(url =  Sys.getenv("OSTESTURL"),
-                         username = Sys.getenv("OSUSERNAME"),
-                         password = Sys.getenv("OSPASSWORDTEST"))
-
-
-cv_samples <- get_bulk_query(auth_response, query_id = 105)
-  
-
-cv_samples[1:5]
+# auth_response <- auth_os(url =  Sys.getenv("OSTESTURL"),
+#                          username = Sys.getenv("OSUSERNAME"),
+#                          password = Sys.getenv("OSPASSWORDTEST"))
+# 
+# 
+# cv_samples <- get_bulk_query(auth_response, query_id = 105)
+#   
+# 
+# cv_samples[1:5]
 ```
   
 ```{r tests-get_bulk_query}

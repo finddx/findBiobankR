@@ -17,13 +17,13 @@
 #' 
 #' @examples
 #'
-#' os_test_url <- Sys.getenv("OSTESTURL")
-#' os_test_username <- Sys.getenv("OSUSERNAME")
-#' os_test_password <- Sys.getenv("OSPASSWORDTEST")
-#'
-#' auth_repo <- auth_os(url = os_test_url,
-#'                      username = os_test_username,
-#'                      password = os_test_password)
+#' # os_test_url <- Sys.getenv("OSTESTURL")
+#' # os_test_username <- Sys.getenv("OSUSERNAME")
+#' # os_test_password <- Sys.getenv("OSPASSWORDTEST")
+#' # 
+#' # auth_repo <- auth_os(url = os_test_url,
+#' #                      username = os_test_username,
+#' #                      password = os_test_password)
 #'
 auth_os <- function(url ,
                     username,
