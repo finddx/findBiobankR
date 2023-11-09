@@ -106,6 +106,47 @@ library(findBiobankR)
 
   
 
+# parse_os_order_data
+
+    
+
+  
+
+```{r example-parse_os_order_data}
+#parse_os_order_data()
+```
+
+  
+
+    
+
+# get_orders
+
+    
+
+  
+
+```{r example-get_orders}
+#get_orders()
+```
+
+  
+
+# get_bulk_orders
+
+    
+
+  
+
+```{r example-get_bulk_orders}
+#get_bulk_orders()
+```
+
+  
+
+  
+  
+
   
 
 
