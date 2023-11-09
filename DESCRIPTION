@@ -9,6 +9,7 @@ License: MIT + file LICENSE
 Depends: 
     R (>= 3.60)
 Imports: 
+    cli,
     data.table,
     DT,
     glue,
@@ -20,6 +21,7 @@ Imports:
     purrr,
     readxl,
     rlang (>= 0.4.11),
+    scales,
     stringr,
     tidyr,
     tools,

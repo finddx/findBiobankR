@@ -928,6 +928,49 @@ test_that("get_patient_id works", {
 })
 ```
   
+# num_thousandth_sep
+    
+```{r function-num_thousandth_sep}
+#' Format Numeric Values with Thousands Separator
+#'
+#' This function takes a numeric atomic vector `x` and formats the values with a thousands separator using `scales::label_comma()`. If the input `x` is not a numeric atomic vector, it will throw an error.
+#'
+#' @param x A numeric atomic vector to be formatted with a thousands separator.
+#' @param sep The character used as the thousands separator (default is a comma).
+#' @return A character vector with formatted numeric values.
+#' @note This function is useful for formatting numeric values in a human-readable format.
+#'
+#' @export
+num_thousandth_sep <- function(x, sep = ",") {
+  
+  if (!is.numeric(x)) {
+    
+    stop("Input is not a numeric  vector.")
+    
+  } else {
+    
+    return(scales::label_comma(big.mark = sep)(x))
+    
+  }
+  
+}
+
+```
+  
+```{r example-num_thousandth_sep}
+
+num_thousandth_sep(100)
+num_thousandth_sep(1234567)
+num_thousandth_sep(c(1234, 5678, 9876))
+
+```
+  
+```{r tests-num_thousandth_sep}
+test_that("num_thousandth_sep works", {
+  expect_true(inherits(num_thousandth_sep, "function")) 
+})
+```
+  
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop

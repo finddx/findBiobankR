@@ -209,14 +209,9 @@ read_multiple_files(folder_path =path_name ,
 ## Get OS Query
 
 ```{r}
-os_test_url <- Sys.getenv("OSTESTURL")
-os_test_username <- Sys.getenv("OSUSERNAME")
-os_test_password <- Sys.getenv("OSPASSWORDTEST")
-
-auth_response <- auth_os(url = os_test_url,
-                         username = os_test_username,
-                         password = os_test_password)
-
+auth_response <- auth_os(url =  Sys.getenv("OSTESTURL"),
+                         username = Sys.getenv("OSUSERNAME"),
+                         password = Sys.getenv("OSPASSWORDTEST"))
 
 query114 <- get_os_query(auth_response, query_id = 114,
                          driving_form = "Participant",
@@ -226,5 +221,15 @@ query114 <- get_os_query(auth_response, query_id = 114,
 
 kable(query114)
 
+```
+
+## Get OS Bulk Query
+
+```{r}
+
+cv_samples <- get_bulk_query(auth_response, query_id = 105)
+  
+
+kable(cv_samples[1:5])
 ```
 

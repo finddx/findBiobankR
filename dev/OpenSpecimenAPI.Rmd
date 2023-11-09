@@ -74,7 +74,7 @@ auth_os <- function(url ,
 
 ```
   
-```{r example-auth_os}
+```{r example-auth_os, eval=FALSE}
 
 os_test_url <- Sys.getenv("OSTESTURL")
 os_test_username <- Sys.getenv("OSUSERNAME")
@@ -124,15 +124,26 @@ parse_data <- function(response) {
   
   # Extract rows from the parsed content
   myrows <- parsed_content_request$rows
-  
+  n_rows <- length(myrows)
   # Create a data frame from the rows
-  df <- lapply(myrows, function(x) {
-    rbind(x)
-  }) %>% data.table::rbindlist()
+  if(n_rows != 0 ) {
+    
+    df <- lapply(myrows, function(x) {
+      rbind(x)
+    }) %>%
+      data.table::rbindlist()
+    
+    if(ncol(df) > 0){
+      
+      names(df) <- col_nms
+    }
+    
+  } else {
+    
+    df <- NULL
+  }
   
-  # Set column names for the data frame
-  names(df) <- col_nms
-  
+
   return(df)
   
 }
@@ -224,7 +235,7 @@ get_os_query <- function(auth_response,
 
 ```
   
-```{r example-get_os_query}
+```{r example-get_os_query, eval=FALSE}
 
 os_test_url <- Sys.getenv("OSTESTURL")
 os_test_username <- Sys.getenv("OSUSERNAME")
@@ -247,10 +258,101 @@ test_that("get_os_query works", {
 })
 ```
   
+# get_bulk_query
+    
+```{r function-get_bulk_query}
+#' Execute Bulk Query
+#'
+#' Execute the "query" method multiple times to fetch all data by page.
+#'
+#' @param auth_response The authentication response obtained from `auth_os`.
+#' @param query_id The saved query identifier.
+#' @param driving_form The driving form for the query (default is "Specimen").
+#' @param wide_row_mode Specifies whether multi-valued attributes result in a single row or one row per value (default is "OFF"). Other permitted values are SHALLOW and DEEP.
+#' @param page_size Page size for each query.
+#' @param max_pages Maximum number of pages to fetch.
+#'
+#' @return A data table containing the results of the bulk query.
+#'
+
+#' @note Make sure to provide an HTTP response with the appropriate structure for parsing.
+#' @export
+get_bulk_query <- function(auth_response,
+                       query_id,
+                       driving_form = "Specimen",
+                       wide_row_mode = "OFF",
+                       page_size = 5000,
+                       max_pages = 10000) {
+  # List to store query results
+  results_list <-vector(mode = "list", length = max_pages) 
+  row_numbers <- vector(mode = "numeric", length = max_pages) 
+  for (i in seq_len(max_pages)) {
+    j = i-1
+    start_at <- j * page_size
+    max_results <- page_size
+    
+    # Execute the query for the current page
+    results <- get_os_query (auth_response,
+                             query_id,
+                             driving_form, 
+                             wide_row_mode,
+                             start_at,
+                             max_results)
+    
+    # Extract rows from the results
+    rows_count <- nrow(results)
+   
+    
+    if (!is.null(results)) {
+      results_list[[i]] <- results  # Store the results in the list
+      row_numbers[i] <- rows_count  # Store the number of rows retrieved
+      cli::cli_alert_success(paste0(num_thousandth_sep(sum(row_numbers)),
+                                    " rows retrieved"))
+      
+    } else {
+      break  # No more data, exit the loop
+    }
+  }
+  
+  
+    # Remove  0 column DFs
+  results_list <- results_list[sapply(results_list, function(x) !is.null(x))]
+  
+   # Return the results as a single data frame
+  df_results = data.table::rbindlist(results_list, fill = T) 
+  
+  return(df_results)
+}
+
+
+
+```
+  
+```{r example-get_bulk_query, eval=FALSE}
+
+
+auth_response <- auth_os(url =  Sys.getenv("OSTESTURL"),
+                         username = Sys.getenv("OSUSERNAME"),
+                         password = Sys.getenv("OSPASSWORDTEST"))
+
+
+cv_samples <- get_bulk_query(auth_response, query_id = 105)
+  
+
+cv_samples[1:5]
+```
+  
+```{r tests-get_bulk_query}
+test_that("get_bulk_query works", {
+  expect_true(inherits(get_bulk_query, "function")) 
+})
+```
+  
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly
-fusen::inflate(flat_file = "dev/OpenSpecimenAPI.Rmd", vignette_name = "Open-Specimen-API")
+fusen::inflate(flat_file = "dev/OpenSpecimenAPI.Rmd", 
+               vignette_name = "Open-Specimen-API")
 ```
 

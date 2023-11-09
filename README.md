@@ -315,14 +315,9 @@ read_multiple_files(folder_path =path_name ,
 ## Get OS Query
 
 ``` r
-os_test_url <- Sys.getenv("OSTESTURL")
-os_test_username <- Sys.getenv("OSUSERNAME")
-os_test_password <- Sys.getenv("OSPASSWORDTEST")
-
-auth_response <- auth_os(url = os_test_url,
-                         username = os_test_username,
-                         password = os_test_password)
-
+auth_response <- auth_os(url =  Sys.getenv("OSTESTURL"),
+                         username = Sys.getenv("OSUSERNAME"),
+                         password = Sys.getenv("OSPASSWORDTEST"))
 
 query114 <- get_os_query(auth_response, query_id = 114,
                          driving_form = "Participant",
@@ -340,3 +335,25 @@ kable(query114)
 | CV0010150000002002 | Fluid - Not Specified | Oropharyngeal Swab        |
 | CV0010150000002003 | Fluid - Not Specified | Oropharyngeal Swab        |
 | CV0010150000002004 | Fluid - Not Specified | Oropharyngeal Swab        |
+
+## Get OS Bulk Query
+
+``` r
+
+cv_samples <- get_bulk_query(auth_response, query_id = 105)
+#> ✔ 5,000 rows retrieved
+#> ✔ 10,000 rows retrieved
+#> ✔ 15,000 rows retrieved
+#> ✔ 18,897 rows retrieved
+  
+
+kable(cv_samples[1:5])
+```
+
+| participant_ppid | specimen_label     | specimen_type         | specimen_available_quantity | specimen_container_name | specimen_container_position |
+|:-----------------|:-------------------|:----------------------|:----------------------------|:------------------------|:----------------------------|
+| CV001015000      | CV0010150000002001 | Fluid - Not Specified | 0.18                        | UPC002.S01.R03.D01.B01  | 1                           |
+| CV001015000      | CV0010150000002002 | Fluid - Not Specified | 0.18                        | UPC002.S01.R03.D01.B01  | 2                           |
+| CV001015000      | CV0010150000002003 | Fluid - Not Specified | 0.18                        | UPC002.S01.R03.D01.B01  | 3                           |
+| CV001015000      | CV0010150000002004 | Fluid - Not Specified | 0.18                        | UPC002.S01.R03.D01.B01  | 4                           |
+| CV001015000      | CV0010150000002005 | Fluid - Not Specified | 0.18                        | UPC002.S01.R03.D01.B01  | 5                           |
