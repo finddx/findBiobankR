@@ -357,3 +357,27 @@ kable(cv_samples[1:5])
 | CV001015000      | CV0010150000002003 | Fluid - Not Specified | 0.18                        | UPC002.S01.R03.D01.B01  | 3                           |
 | CV001015000      | CV0010150000002004 | Fluid - Not Specified | 0.18                        | UPC002.S01.R03.D01.B01  | 4                           |
 | CV001015000      | CV0010150000002005 | Fluid - Not Specified | 0.18                        | UPC002.S01.R03.D01.B01  | 5                           |
+
+## Get os Orders
+
+``` r
+
+orders <- get_bulk_orders(auth_response)
+#> ✔ 36 rows retrieved
+
+requestero_info <- c("requester.id", "requester.firstName", 
+                     "requester.lastName", "requester.emailAddress")
+
+# remove requester info for privacy
+orders[,(requestero_info) := NULL ]
+
+kable(orders[1:5])
+```
+
+|  id | name                        | distributionProtocol.id | distributionProtocol.shortTitle | distributionProtocol.distributedSpecimensCount | distributionProtocol.distributingSites | requester.cpCount | creationDate | executionDate | status   | specimenCnt | siteId | siteName |
+|----:|:----------------------------|------------------------:|:--------------------------------|-----------------------------------------------:|:---------------------------------------|------------------:|-------------:|--------------:|:---------|------------:|-------:|:---------|
+|  58 | Demo DP_Jul 04, 2022 18:06  |                      14 | Demo DP                         |                                              0 | NULL                                   |                 0 | 1.656938e+12 |  1.656938e+12 | EXECUTED |           2 |     NA | NA       |
+|  57 | Demo DP_07-04-2022 17:56:12 |                      14 | Demo DP                         |                                              0 | NULL                                   |                 0 | 1.656938e+12 |  1.656938e+12 | EXECUTED |           4 |     NA | NA       |
+|  56 | Demo DP_Jul 04, 2022 17:52  |                      14 | Demo DP                         |                                              0 | NULL                                   |                 0 | 1.656937e+12 |  1.656937e+12 | EXECUTED |           4 |     NA | NA       |
+|  54 | Demo DP_10-12-2021 13:59:25 |                      14 | Demo DP                         |                                              0 | NULL                                   |                 0 | 1.634027e+12 |  1.634027e+12 | EXECUTED |           2 |     NA | NA       |
+|  52 | Demo DP_09-14-2021 17:00:57 |                      14 | Demo DP                         |                                              0 | NULL                                   |                 0 | 1.631619e+12 |  1.631619e+12 | EXECUTED |           6 |     NA | NA       |

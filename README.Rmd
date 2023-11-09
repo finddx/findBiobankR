@@ -233,3 +233,18 @@ cv_samples <- get_bulk_query(auth_response, query_id = 105)
 kable(cv_samples[1:5])
 ```
 
+## Get os Orders
+
+```{r}
+
+orders <- get_bulk_orders(auth_response)
+
+requestero_info <- c("requester.id", "requester.firstName", 
+                     "requester.lastName", "requester.emailAddress")
+
+# remove requester info for privacy
+orders[,(requestero_info) := NULL ]
+
+kable(orders[1:5])
+```
+
