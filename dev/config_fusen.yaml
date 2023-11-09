@@ -10,6 +10,7 @@ biobank_reports.Rmd:
   - R/get_patient_id.R
   - R/get_site_id.R
   - R/get_specimen_type_id.R
+  - R/num_thousandth_sep.R
   - R/read_multiple_files.R
   - R/read_multiple_sheets.R
   - R/rm_all_na_col.R
@@ -27,6 +28,7 @@ biobank_reports.Rmd:
   - tests/testthat/test-get_specimen_type_id.R
   - tests/testthat/test-get_aliquot_number.R
   - tests/testthat/test-get_patient_id.R
+  - tests/testthat/test-num_thousandth_sep.R
   vignettes: vignettes/biobank-reports.Rmd
   inflate:
     flat_file: dev/biobank_reports.Rmd
@@ -40,12 +42,14 @@ OpenSpecimenAPI.Rmd:
   state: active
   R:
   - R/auth_os.R
+  - R/get_bulk_query.R
   - R/get_os_query.R
   - R/parse_data.R
   tests:
   - tests/testthat/test-auth_os.R
   - tests/testthat/test-parse_data.R
   - tests/testthat/test-get_os_query.R
+  - tests/testthat/test-get_bulk_query.R
   vignettes: vignettes/open-specimen-api.Rmd
   inflate:
     flat_file: dev/OpenSpecimenAPI.Rmd

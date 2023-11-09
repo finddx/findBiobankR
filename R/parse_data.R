@@ -30,15 +30,26 @@ parse_data <- function(response) {
   
   # Extract rows from the parsed content
   myrows <- parsed_content_request$rows
-  
+  n_rows <- length(myrows)
   # Create a data frame from the rows
-  df <- lapply(myrows, function(x) {
-    rbind(x)
-  }) %>% data.table::rbindlist()
+  if(n_rows != 0 ) {
+    
+    df <- lapply(myrows, function(x) {
+      rbind(x)
+    }) %>%
+      data.table::rbindlist()
+    
+    if(ncol(df) > 0){
+      
+      names(df) <- col_nms
+    }
+    
+  } else {
+    
+    df <- NULL
+  }
   
-  # Set column names for the data frame
-  names(df) <- col_nms
-  
+
   return(df)
   
 }
