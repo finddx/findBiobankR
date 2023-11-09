@@ -19,15 +19,15 @@
 #' @examples
 #'
 #'
-#' auth_response <- auth_os(url =  Sys.getenv("OSTESTURL"),
-#'                          username = Sys.getenv("OSUSERNAME"),
-#'                          password = Sys.getenv("OSPASSWORDTEST"))
-#'
-#'
-#' cv_samples <- get_bulk_query(auth_response, query_id = 105)
-#'   
-#'
-#' cv_samples[1:5]
+#' # auth_response <- auth_os(url =  Sys.getenv("OSTESTURL"),
+#' #                          username = Sys.getenv("OSUSERNAME"),
+#' #                          password = Sys.getenv("OSPASSWORDTEST"))
+#' # 
+#' # 
+#' # cv_samples <- get_bulk_query(auth_response, query_id = 105)
+#' #   
+#' # 
+#' # cv_samples[1:5]
 get_bulk_query <- function(auth_response,
                        query_id,
                        driving_form = "Specimen",
