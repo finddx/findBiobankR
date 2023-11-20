@@ -37,11 +37,11 @@
 #' #              start_at = 0,
 #' #              max_results = 5)
 get_os_query <- function(auth_response,
-                      query_id,
-                      driving_form = c("Specimen", "Participant"),
-                      wide_row_mode = c("OFF", "DEEP", "SHALLOW"),
-                      start_at = NULL,
-                      max_results = NULL) {
+                         query_id,
+                         driving_form = c("Specimen", "Participant"),
+                         wide_row_mode = c("OFF", "DEEP", "SHALLOW"),
+                         start_at = NULL,
+                         max_results = NULL) {
   # Match the driving_form argument to one of the allowed values
   driving_form <- match.arg(driving_form)
   # Match the wide_row_mode argument to one of the allowed values
@@ -56,13 +56,13 @@ get_os_query <- function(auth_response,
     startAt = start_at,
     maxResults = max_results
   )
-
+  
   # Specify the content type as JSON in the header
   headers <- add_headers(
     "Content-Type" = "application/json",
     "X-OS-API-TOKEN" = auth_token
   )
-
+  
   # Make the POST request for the query
   response <- POST(
     url = paste0(url, "/query/", query_id),
@@ -70,18 +70,18 @@ get_os_query <- function(auth_response,
     config = headers,
     encode = "json"
   )
-
+  
   # Check the response status code
   status_code <- status_code(response)
-
+  
   if (status_code == 200) {
     # Query successful, return the parsed response content
     return(parse_data(response))
-
+    
   } else {
     # Query failed, return an error message or handle it as needed
     error_message <- content(response, "text")
-    stop(paste("Query failed with status code", status_code, ":", error_message))
+    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
   }
 }
 

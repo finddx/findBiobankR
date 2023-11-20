@@ -49,7 +49,7 @@ parse_data <- function(response) {
     df <- NULL
   }
   
-
+  
   return(df)
   
 }
