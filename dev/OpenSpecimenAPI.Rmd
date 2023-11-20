@@ -356,26 +356,38 @@ test_that("get_bulk_query works", {
 #' This function parses the response data obtained from the OpenSpecimen API and organizes it into a data frame. It assumes that the response is in a structured format suitable for conversion to a data frame.
 #'
 #' @param response The response data to be parsed.
-#'
+#' @param remove_personal_info Logical, whether to remove personal information columns (default is TRUE).
 #' @return A data table containing the parsed order data.
 #'
 #' @importFrom httr content
-#' @importFrom data.table rbindlist as.data.table
+#' @importFrom data.table rbindlist as.data.table setDT
 #' @note See API documentation for details on the response structure. https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/259457077/Retrieve+list+of+Orders
 #'
 #' @export
-parse_os_order_data <- function(response){
-  
-  # Parse the content from the response
-  cont <- content(response, as = "parsed")
-  
-  # Create a data frame by converting each element in the list to a data.table
-  df <- lapply(cont, function(x) {
-    unlist(x, recursive = FALSE) %>% 
-      as.data.table()
-  }) %>% rbindlist(fill = TRUE)
-  
-  return(df)
+parse_os_order_data <- function(response, remove_personal_info = TRUE){
+    
+    # Parse the content from the response
+    cont <- content(response, as = "parsed")
+    
+    # Create a data frame by converting each element in the list to a data.table
+    df <- lapply(cont, function(x) {
+        unlist(x, recursive = FALSE) %>% 
+            as.data.table()
+    }) %>% rbindlist(fill = TRUE) %>%
+         janitor::clean_names() # Clean up column names
+     
+    setDT(df)
+    
+    if(isTRUE(remove_personal_info)){
+        # Remove personal information columns
+        nms <- names(df)
+        personal_info <- nms[grepl("email|phone|name$", nms)]
+        df[, (personal_info) := NULL]
+        
+       
+    }
+    
+     return(df)
 }
 
 ```
@@ -616,7 +628,7 @@ parse_order_detail_data <- function(response, remove_personal_info = TRUE) {
   
   # Delete personal information columns if specified
   if (remove_personal_info) {
-    personal_info <- nmspi_new[grepl("email|phone|name$", nmspi_new)]
+    personal_info <- nms[grepl("email|phone|name$", nms)]
     dt_final[, (personal_info) := NULL]
   }
   
