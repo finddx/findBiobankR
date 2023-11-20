@@ -59,3 +59,90 @@ get_bulk_orders <- function(auth_response,
   return(df_results)
 }
 
+
+#' Parse OpenSpecimen Order Detail Data
+#'
+#' This function parses the response content from the OpenSpecimen API for order details and organizes it into a data.table.
+#'
+#' @param response The response object from the Open Specimen API.
+#' @param remove_personal_info Logical, whether to remove personal information columns (default is TRUE).
+#'
+#' @return A data.table containing the parsed order detail data.
+#'
+#' @importFrom data.table as.data.table data.table
+#' @import janitor
+#'
+#' @export
+#' @examples
+#'
+#' # order_detail <- parse_order_detail_data(response)
+#'
+parse_order_detail_data <- function(response, remove_personal_info = TRUE) {
+  
+  # Parse the response content
+  parsed_cont <- content(response, "parsed") 
+  
+  # Unlist the parsed content
+  parsed_1 <- unlist(parsed_cont, recursive = FALSE) 
+  
+  # Extract extension details
+  extension_details <- parsed_1$distributionProtocol.extensionDetail 
+  
+  # Extract attribute details
+  attr_dp <- extension_details$attrs
+  
+  # Create clean column names
+  col_nms <- sapply(attr_dp, function(x) x$caption) %>% 
+    janitor::make_clean_names()
+  
+  # Extract attribute values
+  values <- lapply(attr_dp, function(x) x$value)
+  
+  # Set names for values
+  names(values) <- col_nms
+  
+  # Convert values to data.table
+  dt1 = as.data.table(values)
+  
+  # Remove extension details from parsed content
+  parsed_1$distributionProtocol.extensionDetail <- NULL
+  
+  # Extract distributing sites
+  dist_sites <- parsed_1$distributionProtocol.distributingSites %>%
+    unlist() %>%
+    paste0(collapse = ",")
+  
+  # Convert distributing sites to data.table
+  dist_sites <- data.table(distributing_site = dist_sites)
+  
+  # Remove distributing sites from parsed content
+  parsed_1$distributionProtocol.distributingSites <- NULL
+  
+  # Unlist the remaining parsed content
+  parsed_2 <- unlist(parsed_1, recursive = FALSE)
+  
+  # Convert parsed content to data.table
+  dt2 = as.data.table(parsed_2)
+  
+  # Combine data.tables
+  dt_final <- cbind(dt2, dt1, dist_sites)
+  
+  # Clean column names
+  findBiobankR::make_clean_os_names(dt_final)
+  
+  # Rename principal investigator columns
+  nms = names(dt_final)
+  nmspi <- nms[grepl("principal_investigator", nms)]
+  nmspi_new <- gsub("distribution_protocol_", "", nmspi)
+  setnames(dt_final, nmspi, nmspi_new)
+  
+  # Delete personal information columns if specified
+  if (remove_personal_info) {
+    personal_info <- nmspi_new[grepl("email|phone|name$", nmspi_new)]
+    dt_final[, (personal_info) := NULL]
+  }
+  
+  # Return the final data.table
+  dt_final
+}
+

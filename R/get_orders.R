@@ -27,8 +27,8 @@ get_orders <- function(auth_response,
   auth_token <- auth_response$auth_response$token
   url <- auth_response$url
   query_request <- list(includeStats = include_stats, 
-                  startAt = start_at,
-                  maxResults = max_results)
+                        startAt = start_at,
+                        maxResults = max_results)
   
   # Specify the content type as JSON in the header
   headers <- add_headers(
@@ -52,7 +52,7 @@ get_orders <- function(auth_response,
   } else {
     # Query failed, return an error message or handle it as needed
     error_message <- content(response, "text")
-    stop(paste("Query failed with status code", status_code, ":", error_message))
+    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
   }
 }
 

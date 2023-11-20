@@ -29,11 +29,11 @@
 #' # 
 #' # cv_samples[1:5]
 get_bulk_query <- function(auth_response,
-                       query_id,
-                       driving_form = "Specimen",
-                       wide_row_mode = "OFF",
-                       page_size = 5000,
-                       max_pages = 10000) {
+                           query_id,
+                           driving_form = "Specimen",
+                           wide_row_mode = "OFF",
+                           page_size = 5000,
+                           max_pages = 10000) {
   # List to store query results
   results_list <-vector(mode = "list", length = max_pages) 
   row_numbers <- vector(mode = "numeric", length = max_pages) 
@@ -52,7 +52,7 @@ get_bulk_query <- function(auth_response,
     
     # Extract rows from the results
     rows_count <- nrow(results)
-   
+    
     
     if (!is.null(results)) {
       results_list[[i]] <- results  # Store the results in the list
@@ -66,10 +66,10 @@ get_bulk_query <- function(auth_response,
   }
   
   
-    # Remove  0 column DFs
+  # Remove  0 column DFs
   results_list <- results_list[sapply(results_list, function(x) !is.null(x))]
   
-   # Return the results as a single data frame
+  # Return the results as a single data frame
   df_results = data.table::rbindlist(results_list, fill = T) 
   
   return(df_results)

@@ -22,10 +22,6 @@ library(findBiobankR)
 
 # auth_os
 
-    
-
-  
-
 ```{r example-auth_os, eval = FALSE}
 
 # os_test_url <- Sys.getenv("OSTESTURL")
@@ -38,30 +34,13 @@ library(findBiobankR)
 
 ```
 
-  
-
-
-  
-
 # parse_data
-
-    
-
-  
 
 ```{r example-parse_data}
 #parse_data()
 ```
 
-  
-
-  
-
 # get_os_query
-
-    
-
-  
 
 ```{r example-get_os_query, eval = FALSE}
 
@@ -80,15 +59,7 @@ library(findBiobankR)
 #              max_results = 5)
 ```
 
-  
-
-  
-
 # get_bulk_query
-
-    
-
-  
 
 ```{r example-get_bulk_query, eval = FALSE}
 
@@ -104,49 +75,46 @@ library(findBiobankR)
 # cv_samples[1:5]
 ```
 
-  
-
 # parse_os_order_data
-
-    
-
-  
 
 ```{r example-parse_os_order_data}
 #parse_os_order_data()
 ```
 
-  
-
-    
-
 # get_orders
-
-    
-
-  
 
 ```{r example-get_orders}
 #get_orders()
 ```
 
-  
-
 # get_bulk_orders
-
-    
-
-  
 
 ```{r example-get_bulk_orders}
 #get_bulk_orders()
 ```
 
+ 
+ # parse_order_detail_data
+    
+
+  
+
+```{r example-parse_order_detail_data}
+
+# order_detail <- parse_order_detail_data(response)
+
+```
+
   
 
   
-  
 
-  
+# get_order_detail
 
+```{r example-get_order_detail}
+# extract order 392 from os
+
+# df = get_order_detail(auth_response, order_id = 392)
+
+```
 

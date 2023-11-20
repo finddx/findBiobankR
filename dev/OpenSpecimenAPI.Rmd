@@ -15,7 +15,7 @@ pkgload::load_all(export_all = FALSE)
 ```
 
 # auth_os
-    
+
 ```{r function-auth_os}
 #' Authenticate to the OpenSpecimen API
 #'
@@ -36,44 +36,44 @@ auth_os <- function(url ,
                     username,
                     password, 
                     domain_name = "openspecimen") {
-    # Define the login request data as a JSON object
-    sessions_url <- paste0(url, "/sessions")
+  # Define the login request data as a JSON object
+  sessions_url <- paste0(url, "/sessions")
+  
+  login <- list(
+    loginName = username,
+    password = password,
+    domainName = domain_name
+  )
+  
+  # Specify the content type as JSON in the header
+  headers <- add_headers("Content-Type" = "application/json")
+  
+  # Make the POST request for authentication
+  response <- POST(
+    url = sessions_url,
+    body = login,
+    config = headers,
+    encode = "json"
+  )
+  
+  # Check the response status code
+  status_code <- status_code(response)
+  
+  if (status_code %in% c(200, 201)) {
+    # Authentication successful, return the response content
+    auth_res = content(response, "parsed")
+    return(list(url = url, auth_response = auth_res))
     
-    login <- list(
-        loginName = username,
-        password = password,
-        domainName = domain_name
-    )
+  } else {
+    # Authentication failed, return an error message or handle it as needed
+    error_message <- content(response, "text")
     
-    # Specify the content type as JSON in the header
-    headers <- add_headers("Content-Type" = "application/json")
-    
-    # Make the POST request for authentication
-    response <- POST(
-        url = sessions_url,
-        body = login,
-        config = headers,
-        encode = "json"
-    )
-    
-    # Check the response status code
-    status_code <- status_code(response)
-    
-    if (status_code %in% c(200, 201)) {
-        # Authentication successful, return the response content
-        auth_res = content(response, "parsed")
-        return(list(url = url, auth_response = auth_res))
-        
-    } else {
-        # Authentication failed, return an error message or handle it as needed
-        error_message <- content(response, "text")
-        
-        stop(paste("Authentication failed with status code", status_code, ":", error_message))
-    }
+    cli::cli_alert_danger(paste("Authentication failed with status code", status_code, ":", error_message))
+  }
 }
 
 ```
-  
+
 ```{r example-auth_os, eval=FALSE}
 
 # os_test_url <- Sys.getenv("OSTESTURL")
@@ -85,16 +85,16 @@ auth_os <- function(url ,
 #                      password = os_test_password)
 
 ```
-  
+
 
 ```{r tests-auth_os}
 test_that("auth_os works", {
   expect_true(inherits(auth_os, "function")) 
 })
 ```
-  
+
 # parse_data
-    
+
 ```{r function-parse_data}
 #' Parse Response Data
 #'
@@ -143,25 +143,25 @@ parse_data <- function(response) {
     df <- NULL
   }
   
-
+  
   return(df)
   
 }
 
 ```
-  
+
 ```{r example-parse_data}
 #parse_data()
 ```
-  
+
 ```{r tests-parse_data}
 test_that("parse_data works", {
   expect_true(inherits(parse_data, "function")) 
 })
 ```
-  
+
 # get_os_query
-    
+
 ```{r function-get_os_query}
 #' Execute a Saved Query
 #'
@@ -185,11 +185,11 @@ test_that("parse_data works", {
 #' 
 #' @export
 get_os_query <- function(auth_response,
-                      query_id,
-                      driving_form = c("Specimen", "Participant"),
-                      wide_row_mode = c("OFF", "DEEP", "SHALLOW"),
-                      start_at = NULL,
-                      max_results = NULL) {
+                         query_id,
+                         driving_form = c("Specimen", "Participant"),
+                         wide_row_mode = c("OFF", "DEEP", "SHALLOW"),
+                         start_at = NULL,
+                         max_results = NULL) {
   # Match the driving_form argument to one of the allowed values
   driving_form <- match.arg(driving_form)
   # Match the wide_row_mode argument to one of the allowed values
@@ -204,13 +204,13 @@ get_os_query <- function(auth_response,
     startAt = start_at,
     maxResults = max_results
   )
-
+  
   # Specify the content type as JSON in the header
   headers <- add_headers(
     "Content-Type" = "application/json",
     "X-OS-API-TOKEN" = auth_token
   )
-
+  
   # Make the POST request for the query
   response <- POST(
     url = paste0(url, "/query/", query_id),
@@ -218,23 +218,23 @@ get_os_query <- function(auth_response,
     config = headers,
     encode = "json"
   )
-
+  
   # Check the response status code
   status_code <- status_code(response)
-
+  
   if (status_code == 200) {
     # Query successful, return the parsed response content
     return(parse_data(response))
-
+    
   } else {
     # Query failed, return an error message or handle it as needed
     error_message <- content(response, "text")
-    stop(paste("Query failed with status code", status_code, ":", error_message))
+    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
   }
 }
 
 ```
-  
+
 ```{r example-get_os_query, eval=FALSE}
 
 # os_test_url <- Sys.getenv("OSTESTURL")
@@ -251,15 +251,15 @@ get_os_query <- function(auth_response,
 #              start_at = 0,
 #              max_results = 5)
 ```
-  
+
 ```{r tests-get_os_query}
 test_that("get_os_query works", {
   expect_true(inherits(get_os_query, "function")) 
 })
 ```
-  
+
 # get_bulk_query
-    
+
 ```{r function-get_bulk_query}
 #' Execute Bulk Query
 #'
@@ -278,11 +278,11 @@ test_that("get_os_query works", {
 #' @note Make sure to provide an HTTP response with the appropriate structure for parsing.
 #' @export
 get_bulk_query <- function(auth_response,
-                       query_id,
-                       driving_form = "Specimen",
-                       wide_row_mode = "OFF",
-                       page_size = 5000,
-                       max_pages = 10000) {
+                           query_id,
+                           driving_form = "Specimen",
+                           wide_row_mode = "OFF",
+                           page_size = 5000,
+                           max_pages = 10000) {
   # List to store query results
   results_list <-vector(mode = "list", length = max_pages) 
   row_numbers <- vector(mode = "numeric", length = max_pages) 
@@ -301,7 +301,7 @@ get_bulk_query <- function(auth_response,
     
     # Extract rows from the results
     rows_count <- nrow(results)
-   
+    
     
     if (!is.null(results)) {
       results_list[[i]] <- results  # Store the results in the list
@@ -315,10 +315,10 @@ get_bulk_query <- function(auth_response,
   }
   
   
-    # Remove  0 column DFs
+  # Remove  0 column DFs
   results_list <- results_list[sapply(results_list, function(x) !is.null(x))]
   
-   # Return the results as a single data frame
+  # Return the results as a single data frame
   df_results = data.table::rbindlist(results_list, fill = T) 
   
   return(df_results)
@@ -327,7 +327,7 @@ get_bulk_query <- function(auth_response,
 
 
 ```
-  
+
 ```{r example-get_bulk_query, eval=FALSE}
 
 
@@ -341,7 +341,7 @@ get_bulk_query <- function(auth_response,
 # 
 # cv_samples[1:5]
 ```
-  
+
 ```{r tests-get_bulk_query}
 test_that("get_bulk_query works", {
   expect_true(inherits(get_bulk_query, "function")) 
@@ -349,7 +349,7 @@ test_that("get_bulk_query works", {
 ```
 
 # parse_os_order_data
-    
+
 ```{r function-parse_os_order_data}
 #' Parse OpenSpecimen Order Data
 #'
@@ -379,19 +379,19 @@ parse_os_order_data <- function(response){
 }
 
 ```
-  
+
 ```{r example-parse_os_order_data}
 #parse_os_order_data()
 ```
-  
+
 ```{r tests-parse_os_order_data}
 test_that("parse_os_order_data works", {
   expect_true(inherits(parse_os_order_data, "function")) 
 })
 ```
-    
+
 # get_orders
-    
+
 ```{r function-get_orders}
 #' Get OpenSpecimen Orders
 #'
@@ -418,8 +418,8 @@ get_orders <- function(auth_response,
   auth_token <- auth_response$auth_response$token
   url <- auth_response$url
   query_request <- list(includeStats = include_stats, 
-                  startAt = start_at,
-                  maxResults = max_results)
+                        startAt = start_at,
+                        maxResults = max_results)
   
   # Specify the content type as JSON in the header
   headers <- add_headers(
@@ -443,18 +443,18 @@ get_orders <- function(auth_response,
   } else {
     # Query failed, return an error message or handle it as needed
     error_message <- content(response, "text")
-    stop(paste("Query failed with status code", status_code, ":", error_message))
+    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
   }
 }
 
 ```
-  
+
 ```{r example-get_orders}
 #get_orders()
 ```
-  
+
 # get_bulk_orders
-    
+
 ```{r function-get_bulk_orders}
 #' Get OpenSpecimen Orders in Bulk
 #'
@@ -514,24 +514,208 @@ get_bulk_orders <- function(auth_response,
 }
 
 ```
-  
+
+
+
 ```{r example-get_bulk_orders}
 #get_bulk_orders()
 ```
-  
+
+
+
 ```{r tests-get_bulk_orders}
 test_that("get_bulk_orders works", {
   expect_true(inherits(get_bulk_orders, "function")) 
 })
 ```
-  
-  
+
+
+
+
 ```{r tests-get_orders}
 test_that("get_orders works", {
   expect_true(inherits(get_orders, "function")) 
 })
 ```
+
+ 
+ # parse_order_detail_data
+    
+```{r function-parse_order_detail_data}
+#' Parse OpenSpecimen Order Detail Data
+#'
+#' This function parses the response content from the OpenSpecimen API for order details and organizes it into a data.table.
+#'
+#' @param response The response object from the Open Specimen API.
+#' @param remove_personal_info Logical, whether to remove personal information columns (default is TRUE).
+#'
+#' @return A data.table containing the parsed order detail data.
+#'
+#' @importFrom data.table as.data.table data.table
+#' @import janitor
+#'
+#' @export
+parse_order_detail_data <- function(response, remove_personal_info = TRUE) {
   
+  # Parse the response content
+  parsed_cont <- content(response, "parsed") 
+  
+  # Unlist the parsed content
+  parsed_1 <- unlist(parsed_cont, recursive = FALSE) 
+  
+  # Extract extension details
+  extension_details <- parsed_1$distributionProtocol.extensionDetail 
+  
+  # Extract attribute details
+  attr_dp <- extension_details$attrs
+  
+  # Create clean column names
+  col_nms <- sapply(attr_dp, function(x) x$caption) %>% 
+    janitor::make_clean_names()
+  
+  # Extract attribute values
+  values <- lapply(attr_dp, function(x) x$value)
+  
+  # Set names for values
+  names(values) <- col_nms
+  
+  # Convert values to data.table
+  dt1 = as.data.table(values)
+  
+  # Remove extension details from parsed content
+  parsed_1$distributionProtocol.extensionDetail <- NULL
+  
+  # Extract distributing sites
+  dist_sites <- parsed_1$distributionProtocol.distributingSites %>%
+    unlist() %>%
+    paste0(collapse = ",")
+  
+  # Convert distributing sites to data.table
+  dist_sites <- data.table(distributing_site = dist_sites)
+  
+  # Remove distributing sites from parsed content
+  parsed_1$distributionProtocol.distributingSites <- NULL
+  
+  # Unlist the remaining parsed content
+  parsed_2 <- unlist(parsed_1, recursive = FALSE)
+  
+  # Convert parsed content to data.table
+  dt2 = as.data.table(parsed_2)
+  
+  # Combine data.tables
+  dt_final <- cbind(dt2, dt1, dist_sites)
+  
+  # Clean column names
+  findBiobankR::make_clean_os_names(dt_final)
+  
+  # Rename principal investigator columns
+  nms = names(dt_final)
+  nmspi <- nms[grepl("principal_investigator", nms)]
+  nmspi_new <- gsub("distribution_protocol_", "", nmspi)
+  setnames(dt_final, nmspi, nmspi_new)
+  
+  # Delete personal information columns if specified
+  if (remove_personal_info) {
+    personal_info <- nmspi_new[grepl("email|phone|name$", nmspi_new)]
+    dt_final[, (personal_info) := NULL]
+  }
+  
+  # Return the final data.table
+  dt_final
+}
+
+```
+  
+```{r example-parse_order_detail_data}
+
+# order_detail <- parse_order_detail_data(response)
+
+```
+  
+```{r tests-parse_order_detail_data}
+test_that("parse_order_detail_data works", {
+  expect_true(inherits(parse_order_detail_data, "function")) 
+})
+```
+  
+# get_order_detail
+
+```{r function-get_order_detail}
+#' Get OpenSpecimen Order Detail
+#'
+#' This function retrieves details of a specific order from the OpenSpecimen API using the provided authentication response and order ID.
+#'
+#' @param auth_response The authentication response obtained from `auth_os`.
+#' @param order_id The ID of the order to retrieve details for.
+#'
+#' @return A data table containing the parsed order detail data.
+#'
+#' @importFrom httr GET status_code 
+#' @export
+get_order_detail <- function(auth_response, order_id) {
+  
+  # Check if order_id is an integer
+  if (isTRUE(round(order_id) != order_id)) {
+    stop("order_id must be an integer")
+  }
+  
+  # Extract the authentication token from the response
+  auth_token <- auth_response$auth_response$token
+  url <- auth_response$url
+  
+  # Specify the content type as JSON in the header
+  headers <- add_headers(
+    "Content-Type" = "application/json",
+    "X-OS-API-TOKEN" = auth_token
+  )
+  
+  # Construct the URL for the order detail
+  order_url <- paste0(url, "/distribution-orders/", order_id)
+  
+  # Make the GET request for the order detail
+  response <- GET(
+    url = order_url,
+    config = headers,
+    encode = "json"
+  )
+  
+  # Check the response status code
+  status_code <- status_code(response)
+  
+  if (status_code == 200) {
+    # Query successful, return the parsed response content
+    return(parse_order_detail_data(response))
+  } else {
+    # Query failed, return an error message or handle it as needed
+    error_message <- content(response, "text")
+    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
+    # Return a special value or an empty data frame in case of error
+    return(NULL)
+  }
+}
+
+```
+
+
+
+
+```{r example-get_order_detail}
+# extract order 392 from os
+
+# df = get_order_detail(auth_response, order_id = 392)
+
+```
+
+
+
+```{r tests-get_order_detail}
+test_that("get_order_detail works", {
+  expect_true(inherits(get_order_detail, "function")) 
+})
+```
+
+
+
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop

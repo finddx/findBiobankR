@@ -29,39 +29,39 @@ auth_os <- function(url ,
                     username,
                     password, 
                     domain_name = "openspecimen") {
-    # Define the login request data as a JSON object
-    sessions_url <- paste0(url, "/sessions")
+  # Define the login request data as a JSON object
+  sessions_url <- paste0(url, "/sessions")
+  
+  login <- list(
+    loginName = username,
+    password = password,
+    domainName = domain_name
+  )
+  
+  # Specify the content type as JSON in the header
+  headers <- add_headers("Content-Type" = "application/json")
+  
+  # Make the POST request for authentication
+  response <- POST(
+    url = sessions_url,
+    body = login,
+    config = headers,
+    encode = "json"
+  )
+  
+  # Check the response status code
+  status_code <- status_code(response)
+  
+  if (status_code %in% c(200, 201)) {
+    # Authentication successful, return the response content
+    auth_res = content(response, "parsed")
+    return(list(url = url, auth_response = auth_res))
     
-    login <- list(
-        loginName = username,
-        password = password,
-        domainName = domain_name
-    )
+  } else {
+    # Authentication failed, return an error message or handle it as needed
+    error_message <- content(response, "text")
     
-    # Specify the content type as JSON in the header
-    headers <- add_headers("Content-Type" = "application/json")
-    
-    # Make the POST request for authentication
-    response <- POST(
-        url = sessions_url,
-        body = login,
-        config = headers,
-        encode = "json"
-    )
-    
-    # Check the response status code
-    status_code <- status_code(response)
-    
-    if (status_code %in% c(200, 201)) {
-        # Authentication successful, return the response content
-        auth_res = content(response, "parsed")
-        return(list(url = url, auth_response = auth_res))
-        
-    } else {
-        # Authentication failed, return an error message or handle it as needed
-        error_message <- content(response, "text")
-        
-        stop(paste("Authentication failed with status code", status_code, ":", error_message))
-    }
+    cli::cli_alert_danger(paste("Authentication failed with status code", status_code, ":", error_message))
+  }
 }
 
