@@ -4,10 +4,12 @@
 \alias{parse_os_order_data}
 \title{Parse OpenSpecimen Order Data}
 \usage{
-parse_os_order_data(response)
+parse_os_order_data(response, remove_personal_info = TRUE)
 }
 \arguments{
 \item{response}{The response data to be parsed.}
+
+\item{remove_personal_info}{Logical, whether to remove personal information columns (default is TRUE).}
 }
 \value{
 A data table containing the parsed order data.
