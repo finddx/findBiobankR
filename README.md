@@ -367,20 +367,6 @@ orders <- get_bulk_orders(auth_response)
 #> Warning in `[.data.table`(df, , `:=`((personal_info), NULL)): length(LHS)==0;
 #> no columns to delete or assign RHS to.
 
-requestero_info <- c("requester.id", "requester.firstName", 
-                     "requester.lastName", "requester.emailAddress")
-
-# remove requester info for privacy
-orders[,(requestero_info) := NULL ]
-#> Warning in `[.data.table`(orders, , `:=`((requestero_info), NULL)): Column
-#> 'requester.id' does not exist to remove
-#> Warning in `[.data.table`(orders, , `:=`((requestero_info), NULL)): Column
-#> 'requester.firstName' does not exist to remove
-#> Warning in `[.data.table`(orders, , `:=`((requestero_info), NULL)): Column
-#> 'requester.lastName' does not exist to remove
-#> Warning in `[.data.table`(orders, , `:=`((requestero_info), NULL)): Column
-#> 'requester.emailAddress' does not exist to remove
-
 kable(orders[1:5])
 ```
 

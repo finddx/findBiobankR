@@ -239,12 +239,6 @@ kable(cv_samples[1:5])
 
 orders <- get_bulk_orders(auth_response)
 
-requestero_info <- c("requester.id", "requester.firstName", 
-                     "requester.lastName", "requester.emailAddress")
-
-# remove requester info for privacy
-orders[,(requestero_info) := NULL ]
-
 kable(orders[1:5])
 ```
 
