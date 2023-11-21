@@ -253,7 +253,6 @@ kable(orders[1:5])
 
 
 ```{r}
-
 oder_details <- get_order_detail(auth_response, order_id = 52)
 
 kable(oder_details)
