@@ -4,7 +4,7 @@
 #'
 #' This function retrieves a list of orders from the OpenSpecimen API in bulk, handling pagination and combining results. It uses the provided authentication response and optional query parameters for customization.
 #'
-#' @param auth_response The authentication response obtained from `authenticateOS`.
+#' @param auth_response The authentication response obtained from `auth_os`.
 #' @param include_stats Logical, whether to include statistics (default is TRUE).
 #' @param page_size Integer, the number of results to retrieve per page (default is 250).
 #' @param max_pages Integer, the maximum number of pages to retrieve (default is 10,000).
@@ -58,98 +58,4 @@ get_bulk_orders <- function(auth_response,
   
   return(df_results)
 }
-
-
-#' Parse OpenSpecimen Order Detail Data
-#'
-#' This function parses the response content from the OpenSpecimen API for order details and organizes it into a data.table.
-#'
-#' @param response The response object from the Open Specimen API.
-#' @param remove_personal_info Logical, whether to remove personal information columns (default is TRUE).
-#'
-#' @return A data.table containing the parsed order detail data.
-#'
-#' @importFrom data.table as.data.table data.table
-#' @import janitor
-#'
-#' @export
-#' @examples
-#'
-#' # order_detail <- parse_order_detail_data(response)
-#'
-# review the code below and see if you can make it more efficient 
-parse_order_detail_data <- function(response, remove_personal_info = TRUE) {
-  
-  # Parse the response content
-  parsed_cont <- content(response, "parsed") 
-  
-  # Unlist the parsed content
-  parsed_1 <- unlist(parsed_cont, recursive = FALSE) 
-  
-  # Extract extension details
-  extension_details <- parsed_1$distributionProtocol.extensionDetail 
-  
-  # Extract attribute details
-  attr_dp <- extension_details$attrs
-  
-  # Create clean column names
-  col_nms <- sapply(attr_dp, function(x) x$caption) %>% 
-    janitor::make_clean_names()
-  
-  # Extract attribute values
-  values <- lapply(attr_dp, function(x) x$value)
-  
-  # Set names for values
-  names(values) <- col_nms
-  
-  # Convert values to data.table
-  dt1 = as.data.table(values)
-  
-  # Remove extension details from parsed content
-  parsed_1$distributionProtocol.extensionDetail <- NULL
-  
-  # Extract distributing sites
-  dist_sites <- parsed_1$distributionProtocol.distributingSites %>%
-    unlist() %>%
-    paste0(collapse = ",")
-  
-  # Convert distributing sites to data.table
-  dist_sites <- data.table(distributing_site = dist_sites)
-  
-  # Remove distributing sites from parsed content
-  parsed_1$distributionProtocol.distributingSites <- NULL
-  
-  # Unlist the remaining parsed content
-  
-
-  parsed_2 <- unlist(parsed_1, recursive = TRUE)
-  
-  
-  # Convert parsed content to data.table
-  dt2 = as.data.table(as.list(parsed_2))
-  
-  # Combine data.tables
-  dt_final <- cbind(dt2, dt1, dist_sites)
-  
-  # Clean column names
-  make_clean_os_names(dt_final)
-  
-  # Rename principal investigator columns
-  nms = names(dt_final)
-  nmspi <- nms[grepl("principal_investigator|distribution_protocol_report", nms)]
-  nmspi_new <- gsub("distribution_protocol_", "", nmspi)
-  setnames(dt_final, nmspi, nmspi_new)
-  
-  # Delete personal information columns if specified
-
-  if (isTRUE(remove_personal_info)) {
-    
-    personal_info <- nms[grepl("email|phone|name", nms)]
-    dt_final[, (personal_info) := NULL]
-  }
-  
-  # Return the final data.table
-  dt_final
-}
-
 

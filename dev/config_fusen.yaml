@@ -42,21 +42,33 @@ OpenSpecimenAPI.Rmd:
   state: active
   R:
   - R/auth_os.R
+  - R/get_bulk_order_detail.R
+  - R/get_bulk_order_items.R
   - R/get_bulk_orders.R
   - R/get_bulk_query.R
   - R/get_order_detail.R
+  - R/get_order_items.R
   - R/get_orders.R
   - R/get_os_query.R
   - R/parse_data.R
+  - R/parse_order_detail_data.R
+  - R/parse_os_oder_list.R
   - R/parse_os_order_data.R
+  - R/parse_os_response.R
   tests:
   - tests/testthat/test-auth_os.R
+  - tests/testthat/test-parse_os_response.R
   - tests/testthat/test-parse_data.R
   - tests/testthat/test-get_os_query.R
   - tests/testthat/test-get_bulk_query.R
   - tests/testthat/test-parse_os_order_data.R
   - tests/testthat/test-get_bulk_orders.R
+  - tests/testthat/test-parse_order_detail_data.R
   - tests/testthat/test-get_order_detail.R
+  - tests/testthat/test-get_bulk_order_detail.R
+  - tests/testthat/test-parse_os_oder_list.R
+  - tests/testthat/test-get_order_items.R
+  - tests/testthat/test-get_bulk_order_items.R
   vignettes: vignettes/open-specimen-api.Rmd
   inflate:
     flat_file: dev/OpenSpecimenAPI.Rmd

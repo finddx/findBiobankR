@@ -7,7 +7,3 @@ test_that("get_bulk_orders works", {
 test_that("get_orders works", {
   expect_true(inherits(get_orders, "function")) 
 })
-
-test_that("parse_order_detail_data works", {
-  expect_true(inherits(parse_order_detail_data, "function")) 
-})

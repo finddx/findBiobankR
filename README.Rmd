@@ -252,3 +252,21 @@ oder_details <- get_order_detail(auth_response, order_id = 52)
 kable(oder_details)
 ```
 
+
+## Get bulk order details
+
+```{r}
+oders_details <- get_bulk_order_detail(auth_response, orders_ids = orders$id )
+
+kable(oders_details[1:5])
+```
+
+## Get Shipped/Distributed Samples
+
+```{r}
+distributed_samples <- get_bulk_order_items(auth_response,
+                                        orders_ids = orders$id )
+
+kable(distributed_samples[1:5])
+
+```

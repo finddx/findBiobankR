@@ -55,12 +55,16 @@ auth_os <- function(url ,
   if (status_code %in% c(200, 201)) {
     # Authentication successful, return the response content
     auth_res = content(response, "parsed")
+    
+    cli::cli_alert_success("Authentication successful")
+    
     return(list(url = url, auth_response = auth_res))
     
   } else {
     # Authentication failed, return an error message or handle it as needed
     error_message <- content(response, "text")
-    
+    error_message <- gsub("[^a-zA-Z0-9 ]", " ", error_message)
+    error_message <- sub(".*\\bmessage\\s*(.*)", "\\1", error_message, ignore.case = TRUE)
     cli::cli_alert_danger(paste("Authentication failed with status code", status_code, ":", error_message))
   }
 }

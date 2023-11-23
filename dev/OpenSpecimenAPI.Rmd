@@ -62,12 +62,16 @@ auth_os <- function(url ,
   if (status_code %in% c(200, 201)) {
     # Authentication successful, return the response content
     auth_res = content(response, "parsed")
+    
+    cli::cli_alert_success("Authentication successful")
+    
     return(list(url = url, auth_response = auth_res))
     
   } else {
     # Authentication failed, return an error message or handle it as needed
     error_message <- content(response, "text")
-    
+    error_message <- gsub("[^a-zA-Z0-9 ]", " ", error_message)
+    error_message <- sub(".*\\bmessage\\s*(.*)", "\\1", error_message, ignore.case = TRUE)
     cli::cli_alert_danger(paste("Authentication failed with status code", status_code, ":", error_message))
   }
 }
@@ -90,6 +94,61 @@ auth_os <- function(url ,
 ```{r tests-auth_os}
 test_that("auth_os works", {
   expect_true(inherits(auth_os, "function")) 
+})
+```
+
+
+# parse_os_response
+
+```{r function-parse_os_response}
+#' OpenSpecimen API Request Response Handler
+#'
+#' This function handles the response from an OpenSpecimen API request, checks the status code,
+#' and returns the parsed response content or handles errors as needed.
+#'
+#' @param response The response object from the OpenSpecimen API request.
+#' @param parse_data_function The function used to parse the response data
+#'
+#' @return Parsed content from the API response.
+#'
+#' @importFrom httr status_code content
+#'
+#' @export
+parse_os_response <- function(response, parse_data_function) {
+  
+  
+
+    status_code <- status_code(response)
+    
+    if (status_code == 200) {
+      # Query successful, return the parsed response content
+      parse_data_function <- match.fun(parse_data_function)
+      #cli::cli_alert_success("Query successful")
+      return(parse_data_function(response))
+      
+    } else {
+      # Query failed, return an error message or handle it as needed
+      error_message <- content(response, "text")
+      error_message <- gsub("[^a-zA-Z0-9 ]", " ", error_message)
+      error_message <- sub(".*\\bmessage\\s*(.*)", "\\1", error_message, ignore.case = TRUE)
+      stop(paste("Query failed with status code", status_code, ":", error_message))
+      
+    }
+ 
+  
+}
+
+```
+
+
+```{r example-parse_os_response}
+#parse_os_response()
+```
+
+
+```{r tests-parse_os_response}
+test_that("parse_os_response works", {
+  expect_true(inherits(parse_os_response, "function")) 
 })
 ```
 
@@ -178,8 +237,6 @@ test_that("parse_data works", {
 #'
 #' @return A data frame containing the results of the saved query.
 #'
-
-#' @import httr
 #' @importFrom httr POST add_headers status_code content
 #' @note See additional information on this API on https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/104529939/Query
 #' 
@@ -219,18 +276,8 @@ get_os_query <- function(auth_response,
     encode = "json"
   )
   
-  # Check the response status code
-  status_code <- status_code(response)
+  parse_os_response(response, parse_data_function =  "parse_data")
   
-  if (status_code == 200) {
-    # Query successful, return the parsed response content
-    return(parse_data(response))
-    
-  } else {
-    # Query failed, return an error message or handle it as needed
-    error_message <- content(response, "text")
-    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
-  }
 }
 
 ```
@@ -365,29 +412,29 @@ test_that("get_bulk_query works", {
 #'
 #' @export
 parse_os_order_data <- function(response, remove_personal_info = TRUE){
+  
+  # Parse the content from the response
+  cont <- content(response, as = "parsed")
+  
+  # Create a data frame by converting each element in the list to a data.table
+  df <- lapply(cont, function(x) {
+    unlist(x, recursive = FALSE) %>% 
+      as.data.table()
+  }) %>% rbindlist(fill = TRUE) %>%
+    janitor::clean_names() # Clean up column names
+  
+  setDT(df)
+  
+  if(isTRUE(remove_personal_info)){
+    # Remove personal information columns
+    nms <- names(df)
+    personal_info <- nms[grepl("email|phone|name$", nms)]
+    df[, (personal_info) := NULL]
     
-    # Parse the content from the response
-    cont <- content(response, as = "parsed")
     
-    # Create a data frame by converting each element in the list to a data.table
-    df <- lapply(cont, function(x) {
-        unlist(x, recursive = FALSE) %>% 
-            as.data.table()
-    }) %>% rbindlist(fill = TRUE) %>%
-         janitor::clean_names() # Clean up column names
-     
-    setDT(df)
-    
-    if(isTRUE(remove_personal_info)){
-        # Remove personal information columns
-        nms <- names(df)
-        personal_info <- nms[grepl("email|phone|name$", nms)]
-        df[, (personal_info) := NULL]
-        
-       
-    }
-    
-     return(df)
+  }
+  
+  return(df)
 }
 
 ```
@@ -446,17 +493,10 @@ get_orders <- function(auth_response,
     config = headers
   )
   
-  # Check the response status code
-  status_code <- status_code(response)
   
-  if (status_code == 200) {
-    # Query successful, return the parsed response content
-    return(parse_os_order_data(response))
-  } else {
-    # Query failed, return an error message or handle it as needed
-    error_message <- content(response, "text")
-    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
-  }
+  parse_os_response(response, parse_data_function = "parse_os_order_data")
+  
+  
 }
 
 ```
@@ -472,7 +512,7 @@ get_orders <- function(auth_response,
 #'
 #' This function retrieves a list of orders from the OpenSpecimen API in bulk, handling pagination and combining results. It uses the provided authentication response and optional query parameters for customization.
 #'
-#' @param auth_response The authentication response obtained from `authenticateOS`.
+#' @param auth_response The authentication response obtained from `auth_os`.
 #' @param include_stats Logical, whether to include statistics (default is TRUE).
 #' @param page_size Integer, the number of results to retrieve per page (default is 250).
 #' @param max_pages Integer, the maximum number of pages to retrieve (default is 10,000).
@@ -550,9 +590,9 @@ test_that("get_orders works", {
 })
 ```
 
- 
- # parse_order_detail_data
-    
+
+# parse_order_detail_data
+
 ```{r function-parse_order_detail_data}
 #' Parse OpenSpecimen Order Detail Data
 #'
@@ -611,7 +651,7 @@ parse_order_detail_data <- function(response, remove_personal_info = TRUE) {
   
   # Unlist the remaining parsed content
   
-
+  
   parsed_2 <- unlist(parsed_1, recursive = TRUE)
   
   
@@ -631,7 +671,7 @@ parse_order_detail_data <- function(response, remove_personal_info = TRUE) {
   setnames(dt_final, nmspi, nmspi_new)
   
   # Delete personal information columns if specified
-
+  
   if (isTRUE(remove_personal_info)) {
     
     personal_info <- nms[grepl("email|phone|name", nms)]
@@ -644,19 +684,21 @@ parse_order_detail_data <- function(response, remove_personal_info = TRUE) {
 
 
 ```
-  
+
 ```{r example-parse_order_detail_data}
 
 # order_detail <- parse_order_detail_data(response)
 
 ```
-  
+
 ```{r tests-parse_order_detail_data}
 test_that("parse_order_detail_data works", {
   expect_true(inherits(parse_order_detail_data, "function")) 
 })
 ```
-  
+
+
+
 # get_order_detail
 
 ```{r function-get_order_detail}
@@ -698,22 +740,24 @@ get_order_detail <- function(auth_response, order_id) {
     encode = "json"
   )
   
-  # Check the response status code
-  status_code <- status_code(response)
   
-  if (status_code == 200) {
-    # Query successful, return the parsed response content
-    return(parse_order_detail_data(response))
-  } else {
-    # Query failed, return an error message or handle it as needed
-    error_message <- content(response, "text")
-    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
-    # Return a special value or an empty data frame in case of error
+  results <- parse_os_response(response,
+                               parse_data_function = "parse_order_detail_data")
+  
+  if(inherits(results, "data.frame")) {
+    
+    return(results)
+    
+  }else {
+    
     return(NULL)
   }
+  
 }
 
 ```
+
+
 
 
 
@@ -734,8 +778,269 @@ test_that("get_order_detail works", {
 ```
 
 
+# get_bulk_order_detail
+
+```{r function-get_bulk_order_detail}
+#' Get Bulk OpenSpecimen Order Details
+#'
+#' This function retrieves details for a bulk list of orders from the OpenSpecimen API using the provided authentication response and order IDs.
+#'
+#' @param auth_response The authentication response obtained from `auth_os`.
+#' @param orders_ids A vector of order IDs for which details are to be retrieved.
+#' @param ... Additional parameters to be passed to `get_order_detail`.
+#'
+#' @return A data.table containing the parsed details for the specified orders.
+#'
+#' @export
+get_bulk_order_detail <- function(auth_response, orders_ids, ...) {
+  
+  # Check if orders_ids is a vector of integers
+  if (isTRUE(any(round(orders_ids) != orders_ids))) {
+    stop("orders_ids must be an integer")
+  }
+  
+  # Convert lapply to a for loop and print after every 100 iterations
+  # Use tryCatch to handle errors
+  
+  list_dfs <- vector("list", length(orders_ids))
+  
+  for (i in seq_along(orders_ids)) {
+    
+    list_dfs[[i]] <- tryCatch(
+      get_order_detail(order_id = orders_ids[i], auth_response, ...),
+      error = function(e) {
+        cli::cli_alert_warning(paste0("Error in order_id: ", orders_ids[i], " ", e$message))
+        return(NULL)
+      }
+    )
+    
+    if (i %% 100 == 0) {
+      cli::cli_alert_success(
+        paste0("Retrieved ", i, " orders",
+               " out of ", length(orders_ids))
+      )
+    }
+  }
+  
+  ## Combine the list of data.tables into a single data.table
+  dt_final = data.table::rbindlist(list_dfs, fill = TRUE)
+  
+  cli::cli_alert_success(paste0("All ", i, " orders retrieved"))
+  
+  return(dt_final)
+  
+}
+
+```
 
 
+
+```{r example-get_bulk_order_detail}
+#get_bulk_order_detail()
+```
+
+
+
+```{r tests-get_bulk_order_detail}
+test_that("get_bulk_order_detail works", {
+  expect_true(inherits(get_bulk_order_detail, "function")) 
+})
+
+```
+
+
+# parse_os_oder_list
+
+```{r function-parse_os_oder_list}
+#' Parse OpenSpecimen Order Item List
+#'
+#' This function parses a list of OpenSpecimen order items list (distributed samples) and returns a data.table with selected fields.
+#'
+#' @param response Response object from httr::GET [Link to Api details](https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/259457102/Retrieve+Order+Items)
+#'
+#' @return A data.table containing parsed information from the OpenSpecimen order items.
+#' @importFrom httr content
+#' @importFrom data.table rbindlist as.data.table
+#' @note  [Link to Api details](https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/259457102/Retrieve+Order+Items)
+#' @export
+parse_os_oder_list <- function(response) {
+  
+  oder_items <- content(response, "parsed")
+  nms <- c("orderId", "orderName", "status", 
+           "specimen.ppid", "specimen.label",
+           "specimen.eventLabel",
+           "specimen.cpShortTitle", 
+           "specimen.visitDate",
+           "specimen.type",
+           "specimen.availabilityStatus")
+  
+  df_list <- lapply(seq_along(oder_items), function(x) {
+    
+    list_x = oder_items[[x]]
+    
+    vec_unlist <- unlist(list_x, recursive = TRUE)
+    nms_all = names(vec_unlist)
+    nms <- nms[nms %in% nms_all]
+    vec_unlist[nms] %>% as.list() %>% 
+      as.data.table()
+    
+  })
+  
+  dt <- rbindlist(df_list, fill = TRUE)
+  
+  make_clean_os_names(dt)
+  
+  return(dt)
+  
+}
+
+```
+
+```{r example-parse_os_oder_list}
+
+#parse_os_oder_list(oder_items)
+
+```
+
+```{r tests-parse_os_oder_list}
+test_that("parse_os_oder_list works", {
+  expect_true(inherits(parse_os_oder_list, "function")) 
+})
+```
+
+# get_order_items
+
+```{r function-get_order_items}
+
+#' Retrieve Order Items from OpenSpecimen
+#'
+#' This function retrieves the details of order items of the requested order from OpenSpecimen.
+#'
+#' @param auth_response Authentication response from OpenSpecimen.
+#' @param order_id ID of the order whose items are requested.
+#'
+#' @return A data.table containing parsed information from the OpenSpecimen order items.
+#'
+#' @importFrom httr GET add_headers
+#' @export
+get_order_items <- function(auth_response, order_id) {
+  
+  if (isTRUE(round(order_id) != order_id)) {
+    stop("order_id must be an integer")
+  }
+  
+  # Extract the authentication token from the response
+  auth_token <- auth_response$auth_response$token
+  url <- auth_response$url
+  
+  # Specify the content type as JSON in the header
+  headers <- add_headers(
+    "Content-Type" = "application/json",
+    "X-OS-API-TOKEN" = auth_token
+  )
+  
+  # Make the GET request for the query
+  response <- GET(
+    url = paste0(url, "/distribution-orders/", order_id, "/items"),
+    config = headers,
+    encode = "json"
+  )
+  
+  # Parse the response and return the results
+  results <- parse_os_response(response,
+                               parse_data_function = "parse_os_oder_list")
+  
+  # If inherits data.frame, return results, else return NULL
+  if (inherits(results, "data.frame")) {
+    return(results)
+  } else {
+    return(NULL)
+  }
+}
+```
+
+
+```{r example-get_order_items}
+#get_order_items()
+```
+
+
+```{r tests-get_order_items}
+test_that("get_order_items works", {
+  expect_true(inherits(get_order_items, "function")) 
+})
+```
+
+# get_bulk_order_items
+    
+```{r function-get_bulk_order_items}
+#' Retrieve Order Items for Multiple Orders
+#'
+#' This function retrieves order items for multiple orders specified by their IDs.
+#'
+#' @param auth_response Authentication response obtained from the OpenSpecimen API.
+#' @param orders_ids Vector of integers representing the IDs of the orders to retrieve items for.
+#' @param ... Additional parameters to be passed to `get_order_items` function.
+#'
+#' @return A data.table containing the retrieved order items.
+#'
+#' @examples
+#' \dontrun{
+#' auth_response <- auth_os(url, username, password)
+#' orders_data <- get_bulk_order_items(auth_response, c(1, 2, 3))
+#' }
+#'
+#' @export
+get_bulk_order_items <- function(auth_response, orders_ids, ...) {
+  
+  # check orders_ids is a vector of integers
+  if(isTRUE(any(round(orders_ids) != orders_ids))) {
+    stop("orders_ids must be an integer")
+  }
+  
+  # use tryCatch to handle errors
+  
+  list_dfs <- vector("list", length(orders_ids))
+  
+  for (i in seq_along(orders_ids)) {
+    
+    list_dfs[[i]] <- tryCatch(
+      get_order_items(auth_response, order_id = orders_ids[i], ...),
+      error = function(e) {
+        cli::cli_alert_warning(paste0("Error in order_id: ", orders_ids[i], " ", e$message))
+        return(NULL)
+      }
+    )
+    
+    if (i %% 10 == 0) {
+      cli::cli_alert_success(
+        paste0("Retrieved ", i, " orders",
+               " out of ", length(orders_ids))
+      )
+    }
+  }
+  
+  ## combine the list of data.tables into a single data.table
+  dt_final = data.table::rbindlist(list_dfs, fill = TRUE)
+  
+  cli::cli_alert_success(paste0("Done: orders retrieved"))
+  
+  return(dt_final)
+  
+}
+
+```
+  
+```{r example-get_bulk_order_items}
+#get_bulk_order_items()
+```
+  
+```{r tests-get_bulk_order_items}
+test_that("get_bulk_order_items works", {
+  expect_true(inherits(get_bulk_order_items, "function")) 
+})
+```
+  
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly

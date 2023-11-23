@@ -15,8 +15,6 @@
 #'
 #' @return A data frame containing the results of the saved query.
 #'
-
-#' @import httr
 #' @importFrom httr POST add_headers status_code content
 #' @note See additional information on this API on https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/104529939/Query
 #' 
@@ -71,17 +69,7 @@ get_os_query <- function(auth_response,
     encode = "json"
   )
   
-  # Check the response status code
-  status_code <- status_code(response)
+  parse_os_response(response, parse_data_function =  "parse_data")
   
-  if (status_code == 200) {
-    # Query successful, return the parsed response content
-    return(parse_data(response))
-    
-  } else {
-    # Query failed, return an error message or handle it as needed
-    error_message <- content(response, "text")
-    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
-  }
 }
 
