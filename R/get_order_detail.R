@@ -43,18 +43,18 @@ get_order_detail <- function(auth_response, order_id) {
     encode = "json"
   )
   
-  # Check the response status code
-  status_code <- status_code(response)
   
-  if (status_code == 200) {
-    # Query successful, return the parsed response content
-    return(parse_order_detail_data(response))
-  } else {
-    # Query failed, return an error message or handle it as needed
-    error_message <- content(response, "text")
-    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
-    # Return a special value or an empty data frame in case of error
+  results <- parse_os_response(response,
+                               parse_data_function = "parse_order_detail_data")
+  
+  if(inherits(results, "data.frame")) {
+    
+    return(results)
+    
+  }else {
+    
     return(NULL)
   }
+  
 }
 

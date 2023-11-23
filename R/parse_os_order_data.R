@@ -16,28 +16,28 @@
 #' @examples
 #' #parse_os_order_data()
 parse_os_order_data <- function(response, remove_personal_info = TRUE){
+  
+  # Parse the content from the response
+  cont <- content(response, as = "parsed")
+  
+  # Create a data frame by converting each element in the list to a data.table
+  df <- lapply(cont, function(x) {
+    unlist(x, recursive = FALSE) %>% 
+      as.data.table()
+  }) %>% rbindlist(fill = TRUE) %>%
+    janitor::clean_names() # Clean up column names
+  
+  setDT(df)
+  
+  if(isTRUE(remove_personal_info)){
+    # Remove personal information columns
+    nms <- names(df)
+    personal_info <- nms[grepl("email|phone|name$", nms)]
+    df[, (personal_info) := NULL]
     
-    # Parse the content from the response
-    cont <- content(response, as = "parsed")
     
-    # Create a data frame by converting each element in the list to a data.table
-    df <- lapply(cont, function(x) {
-        unlist(x, recursive = FALSE) %>% 
-            as.data.table()
-    }) %>% rbindlist(fill = TRUE) %>%
-         janitor::clean_names() # Clean up column names
-     
-    setDT(df)
-    
-    if(isTRUE(remove_personal_info)){
-        # Remove personal information columns
-        nms <- names(df)
-        personal_info <- nms[grepl("email|phone|name$", nms)]
-        df[, (personal_info) := NULL]
-        
-       
-    }
-    
-     return(df)
+  }
+  
+  return(df)
 }
 

@@ -43,16 +43,9 @@ get_orders <- function(auth_response,
     config = headers
   )
   
-  # Check the response status code
-  status_code <- status_code(response)
   
-  if (status_code == 200) {
-    # Query successful, return the parsed response content
-    return(parse_os_order_data(response))
-  } else {
-    # Query failed, return an error message or handle it as needed
-    error_message <- content(response, "text")
-    cli::cli_alert_danger(paste("Query failed with status code", status_code, ":", error_message))
-  }
+  parse_os_response(response, parse_data_function = "parse_os_order_data")
+  
+  
 }
 

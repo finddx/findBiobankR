@@ -12,7 +12,7 @@ get_bulk_orders(
 )
 }
 \arguments{
-\item{auth_response}{The authentication response obtained from \code{authenticateOS}.}
+\item{auth_response}{The authentication response obtained from \code{auth_os}.}
 
 \item{include_stats}{Logical, whether to include statistics (default is TRUE).}
 

@@ -34,6 +34,12 @@ library(findBiobankR)
 
 ```
 
+# parse_os_response
+
+```{r example-parse_os_response}
+#parse_os_response()
+```
+
 # parse_data
 
 ```{r example-parse_data}
@@ -93,21 +99,13 @@ library(findBiobankR)
 #get_bulk_orders()
 ```
 
- 
- # parse_order_detail_data
-    
-
-  
+# parse_order_detail_data
 
 ```{r example-parse_order_detail_data}
 
 # order_detail <- parse_order_detail_data(response)
 
 ```
-
-  
-
-  
 
 # get_order_detail
 
@@ -117,4 +115,38 @@ library(findBiobankR)
 # df = get_order_detail(auth_response, order_id = 392)
 
 ```
+
+# get_bulk_order_detail
+
+```{r example-get_bulk_order_detail}
+#get_bulk_order_detail()
+```
+
+# parse_os_oder_list
+
+```{r example-parse_os_oder_list}
+
+#parse_os_oder_list(oder_items)
+
+```
+
+# get_order_items
+
+```{r example-get_order_items}
+#get_order_items()
+```
+
+# get_bulk_order_items
+
+    
+
+  
+
+```{r example-get_bulk_order_items}
+#get_bulk_order_items()
+```
+
+  
+
+  
 
