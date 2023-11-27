@@ -14,6 +14,7 @@ biobank_reports.Rmd:
   - R/read_multiple_files.R
   - R/read_multiple_sheets.R
   - R/rm_all_na_col.R
+  - R/rm_form_name.R
   - R/summarise_categorical_vars.R
   tests:
   - tests/testthat/test-data_table.R
@@ -29,6 +30,7 @@ biobank_reports.Rmd:
   - tests/testthat/test-get_aliquot_number.R
   - tests/testthat/test-get_patient_id.R
   - tests/testthat/test-num_thousandth_sep.R
+  - tests/testthat/test-rm_form_name.R
   vignettes: vignettes/biobank-reports.Rmd
   inflate:
     flat_file: dev/biobank_reports.Rmd

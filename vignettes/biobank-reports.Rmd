@@ -278,6 +278,18 @@ num_thousandth_sep(c(1234, 5678, 9876))
 
   
 
+# rm_form_name
+
+    
+
+  
+
+```{r example-rm_form_name}
+#rm_form_name()
+```
+
+  
+
   
 
 
