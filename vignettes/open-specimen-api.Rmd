@@ -34,6 +34,31 @@ library(findBiobankR)
 
 ```
 
+# timestamp_to_date
+
+    
+
+  
+
+```{r example-timestamp_to_date}
+
+timestamp <- 1637892323000
+datetime <- timestamp_to_date(timestamp)
+datetime
+# Example 2: Convert timestamp columns in a data frame
+df <- data.frame(id = c(1, 2, 3),
+                 event_date = c(1637892323000, 1637892423000, 1637892523000))
+
+
+timestamp_to_date(df)
+
+df
+```
+
+  
+
+  
+
 # parse_os_response
 
 ```{r example-parse_os_response}

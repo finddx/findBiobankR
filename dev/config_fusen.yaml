@@ -57,8 +57,10 @@ OpenSpecimenAPI.Rmd:
   - R/parse_os_oder_list.R
   - R/parse_os_order_data.R
   - R/parse_os_response.R
+  - R/timestamp_to_date.R
   tests:
   - tests/testthat/test-auth_os.R
+  - tests/testthat/test-timestamp_to_date.R
   - tests/testthat/test-parse_os_response.R
   - tests/testthat/test-parse_data.R
   - tests/testthat/test-get_os_query.R

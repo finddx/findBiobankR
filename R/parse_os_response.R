@@ -25,7 +25,15 @@ parse_os_response <- function(response, parse_data_function) {
       # Query successful, return the parsed response content
       parse_data_function <- match.fun(parse_data_function)
       #cli::cli_alert_success("Query successful")
-      return(parse_data_function(response))
+      df = parse_data_function(response)
+      
+      # if inherits data.frame apply timestamp_to_date
+      
+      if(inherits(df, "data.frame")){
+        df <- timestamp_to_date(df)
+      }
+      
+      return(df)
       
     } else {
       # Query failed, return an error message or handle it as needed
