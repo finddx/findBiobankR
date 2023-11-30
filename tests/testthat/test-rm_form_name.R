@@ -3,3 +3,7 @@
 test_that("rm_form_name works", {
   expect_true(inherits(rm_form_name, "function")) 
 })
+
+test_that("groupby_vec works", {
+  expect_true(inherits(groupby_vec, "function")) 
+})

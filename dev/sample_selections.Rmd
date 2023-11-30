@@ -638,6 +638,11 @@ make_clean_os_names.default <- function(names_os_df){
   for(i in 1:length(split_nms)){
     
     this_s = split_nms[[i]] %>% unlist()
+    
+    if(length(this_s) < 2){
+      new_names[i] = this_s
+      next
+    }
     tru_same = this_s[1] == this_s[2]
     
     if(tru_same& length(this_s) >= 2){

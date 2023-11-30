@@ -1012,6 +1012,64 @@ test_that("rm_form_name works", {
 })
 ```
   
+  # groupby_vec
+    
+```{r function-groupby_vec}
+#' Group By Vector Elements and Count Frequencies
+#'
+#' This function takes a data frame, a vector of column names (`myvec`), and a vector of grouping 
+#' column names (`byvec`). It then groups the data frame by each element in `myvec` along with the 
+#' specified grouping columns (`byvec`). For each group, it counts the frequencies of non-empty 
+#' and non-missing values in the specified column (`myvec_i`) and returns a summary data frame.
+#'
+#' @param df The input data frame.
+#' @param myvec A vector of column names to be used for grouping and counting frequencies.
+#' @param byvec A vector of column names for grouping the data frame. ID columns that don't change
+#'
+#' @return A data table summarizing the frequencies of non-empty and non-missing values in 
+#' each group for the specified columns.
+#'
+#'
+#' @export
+groupby_vec <- function(df, myvec, byvec) {
+    # Use lapply to iterate over myvec
+    list_dfs <- lapply(myvec, function(myvec_i) {
+        # Combine grouping columns with the current myvec element
+        byvec2 <- c(byvec, myvec_i)
+        
+        # Group by specified columns and count frequencies
+        specs <- df[get(myvec_i) != "" | !is.na(get(myvec_i)), 
+                    list(freq = .N), by = byvec2]
+        
+        # Rename the column representing myvec element to "variable"
+        setnames(specs, myvec_i, "variable")
+        
+        # Add a new column to store the original column name (myvec element)
+        specs[, col_name := myvec_i]
+        
+        # Return the summarized data frame
+       specs
+    })
+    
+    # Combine the list of data frames into a single data frame
+    mydf <- data.table::rbindlist(list_dfs, fill = TRUE)
+    
+    # Return the summarized data frame
+    mydf
+}
+
+```
+  
+```{r example-groupby_vec}
+#groupby_vec()
+```
+  
+```{r tests-groupby_vec}
+test_that("groupby_vec works", {
+  expect_true(inherits(groupby_vec, "function")) 
+})
+```
+  
 
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop

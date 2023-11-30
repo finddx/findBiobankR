@@ -10,11 +10,11 @@ biobank_reports.Rmd:
   - R/get_patient_id.R
   - R/get_site_id.R
   - R/get_specimen_type_id.R
+  - R/rm_form_name.R
   - R/num_thousandth_sep.R
   - R/read_multiple_files.R
   - R/read_multiple_sheets.R
   - R/rm_all_na_col.R
-  - R/rm_form_name.R
   - R/summarise_categorical_vars.R
   tests:
   - tests/testthat/test-data_table.R
