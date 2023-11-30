@@ -291,5 +291,17 @@ num_thousandth_sep(c(1234, 5678, 9876))
   
 
   
+  # groupby_vec
+    
+
+  
+
+```{r example-groupby_vec}
+#groupby_vec()
+```
+
+  
+
+  
 
 

@@ -5,4 +5,5 @@ globalVariables(c("specimen_barcode",
                   "checked",
                   "..nms2",
                   "..all_cols",
-                  "sheet_name"))
+                  "sheet_name",
+                  "col_name"))
