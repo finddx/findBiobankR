@@ -269,3 +269,11 @@ distributed_samples <- get_bulk_order_items(auth_response,
 kable(distributed_samples[1:5])
 
 ```
+
+## Get all Sites
+
+```{r}
+sites <- get_all_sites(auth_response)
+kable(sites[1:5])
+```
+

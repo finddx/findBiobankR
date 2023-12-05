@@ -98,7 +98,7 @@ test_that("auth_os works", {
 ```
 
 # timestamp_to_date
-    
+
 ```{r function-timestamp_to_date}
 #' Convert Timestamp to Date
 #'
@@ -159,14 +159,18 @@ timestamp_to_date.data.frame <- function(timestamp, date_cols = NULL){
   
   data.table::setDT(timestamp)
   
+  
+  
   timestamp[, (date_cols) := lapply(.SD, timestamp_to_date.numeric), .SDcols = date_cols]
   
-
-
+  
+  
+  
+  
 }
 
 ```
-  
+
 ```{r example-timestamp_to_date}
 
 timestamp <- 1637892323000
@@ -181,13 +185,13 @@ timestamp_to_date(df)
 
 df
 ```
-  
+
 ```{r tests-timestamp_to_date}
 test_that("timestamp_to_date works", {
   expect_true(inherits(timestamp_to_date, "function")) 
 })
 ```
-  
+
 # parse_os_response
 
 ```{r function-parse_os_response}
@@ -207,32 +211,32 @@ test_that("timestamp_to_date works", {
 parse_os_response <- function(response, parse_data_function) {
   
   
-
-    status_code <- status_code(response)
+  
+  status_code <- status_code(response)
+  
+  if (status_code == 200) {
+    # Query successful, return the parsed response content
+    parse_data_function <- match.fun(parse_data_function)
+    #cli::cli_alert_success("Query successful")
+    df = parse_data_function(response)
     
-    if (status_code == 200) {
-      # Query successful, return the parsed response content
-      parse_data_function <- match.fun(parse_data_function)
-      #cli::cli_alert_success("Query successful")
-      df = parse_data_function(response)
-      
-      # if inherits data.frame apply timestamp_to_date
-      
-      if(inherits(df, "data.frame")){
-        df <- timestamp_to_date(df)
-      }
-      
-      return(df)
-      
-    } else {
-      # Query failed, return an error message or handle it as needed
-      error_message <- content(response, "text")
-      error_message <- gsub("[^a-zA-Z0-9 ]", " ", error_message)
-      error_message <- sub(".*\\bmessage\\s*(.*)", "\\1", error_message, ignore.case = TRUE)
-      stop(paste("Query failed with status code", status_code, ":", error_message))
-      
+    # if inherits data.frame apply timestamp_to_date
+    
+    if(inherits(df, "data.frame")){
+      df <- timestamp_to_date(df)
     }
- 
+    
+    return(df)
+    
+  } else {
+    # Query failed, return an error message or handle it as needed
+    error_message <- content(response, "text")
+    error_message <- gsub("[^a-zA-Z0-9 ]", " ", error_message)
+    error_message <- sub(".*\\bmessage\\s*(.*)", "\\1", error_message, ignore.case = TRUE)
+    stop(paste("Query failed with status code", status_code, ":", error_message))
+    
+  }
+  
   
 }
 
@@ -1069,8 +1073,48 @@ test_that("get_order_items works", {
 })
 ```
 
+# parse_all_sites
+
+```{r function-parse_all_sites}
+#' Parse All Sites
+#'
+#' Use this function to parse the response content from the OpenSpecimen API
+#' and extract the details of all sites.
+#'
+#' @param response The response object obtained from the OpenSpecimen API.
+#'
+#' @return A data frame containing the details of all sites.
+#'
+#' @export
+parse_all_sites <- function(response) {
+  
+  # Extract the content from the response
+  mycontent <- content(response, "parsed")
+  
+  # Extract the sites from the content
+  df <- lapply(mycontent, as.data.table) %>%
+    rbindlist(fill = TRUE)
+  
+  # Return the sites
+  return(df)
+  
+}
+
+```
+
+```{r example-parse_all_sites}
+#parse_all_sites()
+```
+
+```{r tests-parse_all_sites}
+test_that("parse_all_sites works", {
+  expect_true(inherits(parse_all_sites, "function")) 
+})
+```
+
+
 # get_bulk_order_items
-    
+
 ```{r function-get_bulk_order_items}
 #' Retrieve Order Items for Multiple Orders
 #'
@@ -1128,17 +1172,79 @@ get_bulk_order_items <- function(auth_response, orders_ids, ...) {
 }
 
 ```
-  
+
 ```{r example-get_bulk_order_items}
 #get_bulk_order_items()
 ```
-  
+
 ```{r tests-get_bulk_order_items}
 test_that("get_bulk_order_items works", {
   expect_true(inherits(get_bulk_order_items, "function")) 
 })
 ```
+
+
+
+# get_all_sites
+
+```{r function-get_all_sites}
+#' Get All Sites
+#'
+#' Use this function to retrieve all the sites in the OpenSpecimen application.
+#' The function sends an HTTP GET request to the OpenSpecimen server to fetch 
+#' details of all the sites.
+#'
+#' @param auth_response Authentication response object obtained from the OpenSpecimen API.
+#'
+#' @return A data table containing the details of all sites, or NULL if an error occurs.
+#'
+#' @seealso \code{\link{auth_os}}, \code{\link{parse_os_response}}, \code{\link{parse_all_sites}}
+#' @note [see api docs for more details:](https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/1115685/Get+All+Sites)
+#' @export
+get_all_sites <- function(auth_response) {
   
+  # URL to get all sites
+  # For more details, refer to: https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/1115685/Get+All+Sites
+  url <- paste0(auth_response$url, "/sites")
+  
+  # Specify the content type as JSON in the header
+  headers <- add_headers(
+    "Content-Type" = "application/json",
+    "X-OS-API-TOKEN" = auth_response$auth_response$token
+  )
+  
+  # Make the GET request for the query
+  response <- GET(url = url, config = headers, encode = "json")
+  
+  # Parse the response and return the results
+  results <- parse_os_response(response, parse_data_function = "parse_all_sites")
+  
+  # If inherits data.frame, return results, else return NULL
+  if (inherits(results, "data.frame")) {
+    return(results)
+  } else {
+    return(NULL)
+  }
+}
+
+
+
+```
+
+
+```{r example-get_all_sites}
+#get_all_sites()
+```
+
+
+```{r tests-get_all_sites}
+test_that("get_all_sites works", {
+  expect_true(inherits(get_all_sites, "function")) 
+})
+```
+
+
+
 ```{r development-inflate, eval=FALSE}
 # Run but keep eval=FALSE to avoid infinite loop
 # Execute in the console directly

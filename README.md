@@ -451,3 +451,21 @@ kable(distributed_samples[1:5])
 | 57       | Demo DP_07-04-2022 17:56:12 | RETURNED               | CH000010025   | CH0000100250006001 | Baseline             | CH000                   | 2019-10-22 09:53:08 | Plasma        | Available                    |
 | 57       | Demo DP_07-04-2022 17:56:12 | DISTRIBUTED_AND_CLOSED | CH000010025   | CH0000100250006002 | Baseline             | CH000                   | 2019-10-22 09:53:08 | Plasma        | Distributed                  |
 | 57       | Demo DP_07-04-2022 17:56:12 | DISTRIBUTED_AND_CLOSED | CH000010025   | CH0000100250006003 | Baseline             | CH000                   | 2019-10-22 09:53:08 | Plasma        | Distributed                  |
+
+## Get all Sites
+
+``` r
+sites <- get_all_sites(auth_response)
+#> Warning in `[.data.table`(timestamp, , `:=`((date_cols), lapply(.SD,
+#> timestamp_to_date.numeric)), : length(LHS)==0; no columns to delete or assign
+#> RHS to.
+kable(sites[1:5])
+```
+
+|  id | name                    | instituteName                     | code | type            | activityStatus | cpCount |
+|----:|:------------------------|:----------------------------------|:-----|:----------------|:---------------|--------:|
+|  80 | AAMI                    | Australian Army Malaria Institute | 09   | Not Specified   | Active         |       0 |
+| 132 | Access Bio Site 2       | Access Bio, Inc                   | NA   | Not Specified   | Active         |       0 |
+| 130 | Access Bio, Inc         | Access Bio, Inc                   | NA   | Not Specified   | Active         |       0 |
+| 131 | Alere Technologies GmbH | Alere Technologies GmbH           | NA   | Not Specified   | Active         |       0 |
+| 124 | ARC                     | American Red Cross                | NA   | Collection Site | Active         |       0 |
