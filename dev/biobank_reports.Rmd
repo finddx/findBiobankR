@@ -995,8 +995,7 @@ rm_form_name <- function(df, form_name = "participant_additional_fields_tb_c_ps_
   nms <- names(df)
   nms_new <- gsub(form_name, "", nms)
   setnames(df, nms, nms_new)
-  
-  return(df)
+
   
 }
 

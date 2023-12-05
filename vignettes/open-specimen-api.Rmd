@@ -36,10 +36,6 @@ library(findBiobankR)
 
 # timestamp_to_date
 
-    
-
-  
-
 ```{r example-timestamp_to_date}
 
 timestamp <- 1637892323000
@@ -54,10 +50,6 @@ timestamp_to_date(df)
 
 df
 ```
-
-  
-
-  
 
 # parse_os_response
 
@@ -161,17 +153,21 @@ df
 #get_order_items()
 ```
 
+# parse_all_sites
+
+```{r example-parse_all_sites}
+#parse_all_sites()
+```
+
 # get_bulk_order_items
-
-    
-
-  
 
 ```{r example-get_bulk_order_items}
 #get_bulk_order_items()
 ```
 
-  
+# get_all_sites
 
-  
+```{r example-get_all_sites}
+#get_all_sites()
+```
 

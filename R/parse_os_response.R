@@ -18,32 +18,32 @@
 parse_os_response <- function(response, parse_data_function) {
   
   
-
-    status_code <- status_code(response)
+  
+  status_code <- status_code(response)
+  
+  if (status_code == 200) {
+    # Query successful, return the parsed response content
+    parse_data_function <- match.fun(parse_data_function)
+    #cli::cli_alert_success("Query successful")
+    df = parse_data_function(response)
     
-    if (status_code == 200) {
-      # Query successful, return the parsed response content
-      parse_data_function <- match.fun(parse_data_function)
-      #cli::cli_alert_success("Query successful")
-      df = parse_data_function(response)
-      
-      # if inherits data.frame apply timestamp_to_date
-      
-      if(inherits(df, "data.frame")){
-        df <- timestamp_to_date(df)
-      }
-      
-      return(df)
-      
-    } else {
-      # Query failed, return an error message or handle it as needed
-      error_message <- content(response, "text")
-      error_message <- gsub("[^a-zA-Z0-9 ]", " ", error_message)
-      error_message <- sub(".*\\bmessage\\s*(.*)", "\\1", error_message, ignore.case = TRUE)
-      stop(paste("Query failed with status code", status_code, ":", error_message))
-      
+    # if inherits data.frame apply timestamp_to_date
+    
+    if(inherits(df, "data.frame")){
+      df <- timestamp_to_date(df)
     }
- 
+    
+    return(df)
+    
+  } else {
+    # Query failed, return an error message or handle it as needed
+    error_message <- content(response, "text")
+    error_message <- gsub("[^a-zA-Z0-9 ]", " ", error_message)
+    error_message <- sub(".*\\bmessage\\s*(.*)", "\\1", error_message, ignore.case = TRUE)
+    stop(paste("Query failed with status code", status_code, ":", error_message))
+    
+  }
+  
   
 }
 
