@@ -30,7 +30,9 @@ parse_os_response <- function(response, parse_data_function) {
     # if inherits data.frame apply timestamp_to_date
     
     if(inherits(df, "data.frame")){
-      df <- timestamp_to_date(df)
+      
+      
+      timestamp_to_date(df)
     }
     
     return(df)
