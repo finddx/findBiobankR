@@ -325,9 +325,6 @@ query114 <- get_os_query(auth_response, query_id = 114,
                          wide_row_mode = "OFF",
                          start_at = 0,
                          max_results = 5)
-#> Warning in `[.data.table`(timestamp, , `:=`((date_cols), lapply(.SD,
-#> timestamp_to_date.numeric)), : length(LHS)==0; no columns to delete or assign
-#> RHS to.
 
 kable(query114)
 ```
@@ -345,21 +342,9 @@ kable(query114)
 ``` r
 
 cv_samples <- get_bulk_query(auth_response, query_id = 105)
-#> Warning in `[.data.table`(timestamp, , `:=`((date_cols), lapply(.SD,
-#> timestamp_to_date.numeric)), : length(LHS)==0; no columns to delete or assign
-#> RHS to.
 #> ✔ 5,000 rows retrieved
-#> Warning in `[.data.table`(timestamp, , `:=`((date_cols), lapply(.SD,
-#> timestamp_to_date.numeric)), : length(LHS)==0; no columns to delete or assign
-#> RHS to.
 #> ✔ 10,000 rows retrieved
-#> Warning in `[.data.table`(timestamp, , `:=`((date_cols), lapply(.SD,
-#> timestamp_to_date.numeric)), : length(LHS)==0; no columns to delete or assign
-#> RHS to.
 #> ✔ 15,000 rows retrieved
-#> Warning in `[.data.table`(timestamp, , `:=`((date_cols), lapply(.SD,
-#> timestamp_to_date.numeric)), : length(LHS)==0; no columns to delete or assign
-#> RHS to.
 #> ✔ 18,897 rows retrieved
   
 
@@ -382,9 +367,6 @@ orders <- get_bulk_orders(auth_response)
 #> ✔ 36 rows retrieved
 #> Warning in `[.data.table`(df, , `:=`((personal_info), NULL)): length(LHS)==0;
 #> no columns to delete or assign RHS to.
-#> Warning in `[.data.table`(timestamp, , `:=`((date_cols), lapply(.SD,
-#> timestamp_to_date.numeric)), : length(LHS)==0; no columns to delete or assign
-#> RHS to.
 
 kable(orders[1:5])
 ```
@@ -456,9 +438,6 @@ kable(distributed_samples[1:5])
 
 ``` r
 sites <- get_all_sites(auth_response)
-#> Warning in `[.data.table`(timestamp, , `:=`((date_cols), lapply(.SD,
-#> timestamp_to_date.numeric)), : length(LHS)==0; no columns to delete or assign
-#> RHS to.
 kable(sites[1:5])
 ```
 
@@ -469,3 +448,22 @@ kable(sites[1:5])
 | 130 | Access Bio, Inc         | Access Bio, Inc                   | NA   | Not Specified   | Active         |       0 |
 | 131 | Alere Technologies GmbH | Alere Technologies GmbH           | NA   | Not Specified   | Active         |       0 |
 | 124 | ARC                     | American Red Cross                | NA   | Collection Site | Active         |       0 |
+
+## Get all Sites details
+
+``` r
+
+sites_details <- get_bulk_site_details(auth_response, 
+                               site_ids = sites$id)
+kable(sites_details[1:5])
+```
+
+|                       id | name                    | instituteName                     | code | type            | activityStatus | cpCount | address                                                                                            | country |
+|-------------------------:|:------------------------|:----------------------------------|:-----|:----------------|:---------------|--------:|:---------------------------------------------------------------------------------------------------|:--------|
+|                       80 | AAMI                    | Australian Army Malaria Institute | 09   | Not Specified   | Active         |       0 | Australian Army Malaria InstituteWeary Dunlop DriveGallipoli Barracks, Enoggera Qld Australia 4051 | NA      |
+|                      132 | Access Bio Site 2       | Access Bio, Inc                   | NA   | Not Specified   | Active         |       0 | other dept, 65 Clude Rd Suite A,                                                                   |         |
+| Somerset, NJ, 08873, USA | NA                      |                                   |      |                 |                |         |                                                                                                    |         |
+|                      130 | Access Bio, Inc         | Access Bio, Inc                   | NA   | Not Specified   | Active         |       0 | 65 Clude Rd Suite A,                                                                               |         |
+| Somerset, NJ, 08873, USA | NA                      |                                   |      |                 |                |         |                                                                                                    |         |
+|                      131 | Alere Technologies GmbH | Alere Technologies GmbH           | NA   | Not Specified   | Active         |       0 | Loebstedter Str. 103-105, Jena, 07749, Germany                                                     | NA      |
+|                      124 | ARC                     | American Red Cross                | NA   | Collection Site | Active         |       0 | NA                                                                                                 | NA      |

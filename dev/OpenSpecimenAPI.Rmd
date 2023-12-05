@@ -159,9 +159,15 @@ timestamp_to_date.data.frame <- function(timestamp, date_cols = NULL){
   
   data.table::setDT(timestamp)
   
+  leng <- length(date_cols)
+  
+  if(leng != 0){
+    
+    timestamp[, (date_cols) := lapply(.SD, timestamp_to_date.numeric), .SDcols = date_cols]
+  }
   
   
-  timestamp[, (date_cols) := lapply(.SD, timestamp_to_date.numeric), .SDcols = date_cols]
+  
   
   
   
@@ -170,6 +176,7 @@ timestamp_to_date.data.frame <- function(timestamp, date_cols = NULL){
 }
 
 ```
+
 
 ```{r example-timestamp_to_date}
 
@@ -185,6 +192,8 @@ timestamp_to_date(df)
 
 df
 ```
+
+
 
 ```{r tests-timestamp_to_date}
 test_that("timestamp_to_date works", {
@@ -223,7 +232,9 @@ parse_os_response <- function(response, parse_data_function) {
     # if inherits data.frame apply timestamp_to_date
     
     if(inherits(df, "data.frame")){
-      df <- timestamp_to_date(df)
+      
+      
+      timestamp_to_date(df)
     }
     
     return(df)
@@ -1173,15 +1184,19 @@ get_bulk_order_items <- function(auth_response, orders_ids, ...) {
 
 ```
 
+
 ```{r example-get_bulk_order_items}
 #get_bulk_order_items()
 ```
+
+
 
 ```{r tests-get_bulk_order_items}
 test_that("get_bulk_order_items works", {
   expect_true(inherits(get_bulk_order_items, "function")) 
 })
 ```
+
 
 
 
@@ -1243,6 +1258,197 @@ test_that("get_all_sites works", {
 })
 ```
 
+
+
+# parse_site_details
+
+```{r function-parse_site_details}
+#' Parse OpenSpecimen Site Details
+#'
+#' Use this function to parse the response and extract details of a site from the OpenSpecimen application.
+#'
+#' @param response The API response object.
+#'
+#' @return A data table containing the parsed details of the site.
+#'
+#' @export
+parse_site_details <- function(response) {
+  
+  # Extract the content from the response
+  mycontent2 <- content(response, "parsed")
+  
+  # Extract extension details
+  extension_details <- mycontent2$extensionDetail
+  
+  # Extract attribute details
+  attr_dp <- extension_details$attrs
+  
+  # Create clean column names
+  col_nms <- sapply(attr_dp, function(x) x$caption) %>% 
+    janitor::make_clean_names()
+  
+  # Extract attribute values
+  values <- lapply(attr_dp, function(x) x$value)
+  
+  # Set names for values
+  names(values) <- col_nms
+  
+  # Convert values to data.table
+  dt1 = as.data.table(values)
+  
+  # Remove extension details from parsed content
+  mycontent2$extensionDetail <- NULL
+  mycontent2$coordinators <- NULL
+  # Convert remaining parsed content to data.table
+  mycontentdf <- mycontent2 %>% as.data.table()
+  
+  # Combine data.tables
+  mycontentdf <- cbind(mycontentdf, dt1)
+  
+  # Return the final data.table
+  mycontentdf
+  
+}
+
+```
+
+
+```{r example-parse_site_details}
+#parse_site_details()
+```
+
+
+```{r tests-parse_site_details}
+test_that("parse_site_details works", {
+  expect_true(inherits(parse_site_details, "function")) 
+})
+```
+
+
+
+# get_os_site
+
+```{r function-get_os_site}
+#' Get OpenSpecimen Site
+#'
+#' Use this function to retrieve details of a site from the OpenSpecimen application.
+#'
+#' @param auth_response Authentication response object obtained from the OpenSpecimen API.
+#' @param site_id The unique identifier of the site to fetch.
+#'
+#' @return A data frame containing the details of the specified site.
+#'
+#' @export
+get_os_site <- function(auth_response, site_id) {
+  
+  # Get the site details
+  # Specify the content type as JSON in the header
+  # Extract the authentication token from the response
+  auth_token <- auth_response$auth_response$token
+  url <- auth_response$url
+  
+  headers <- add_headers(
+    "Content-Type" = "application/json",
+    "X-OS-API-TOKEN" = auth_token
+  )
+  
+  # Make the GET request for the query
+  response <- GET(
+    url = paste0(url, "/sites/", site_id),
+    config = headers,
+    encode = "json"
+  )
+  
+  # Parse the response and return the results
+  results <- parse_os_response(response, 
+                               parse_data_function = "parse_site_details")
+  
+  # If inherits data.frame, return results, else return NULL
+  if (inherits(results, "data.frame")) {
+    return(results)
+  } else {
+    return(NULL)
+  }
+  
+}
+
+```
+
+
+```{r example-get_os_site}
+#get_os_site()
+```
+
+
+```{r tests-get_os_site}
+test_that("get_os_site works", {
+  expect_true(inherits(get_os_site, "function")) 
+})
+```
+
+# get_bulk_site_details
+
+```{r function-get_bulk_site_details}
+#' Get Bulk Site Details
+#'
+#' Use this function to retrieve details of multiple sites in bulk from the OpenSpecimen application.
+#'
+#' @param auth_response The authentication response object.
+#' @param site_ids A vector of integers representing the IDs of the sites to retrieve details for.
+#' @param ... Additional parameters to be passed to the underlying `get_os_site` function.
+#'
+#' @return A data table containing the details of the requested sites.
+#'
+#' @export
+get_bulk_site_details <- function(auth_response, site_ids, ...) {
+  
+  # Check if site_ids is a vector of integers
+  if (isTRUE(any(round(site_ids) != site_ids))) {
+    stop("site_ids must be an integer")
+  }
+  
+  # Use tryCatch to handle errors
+  
+  list_dfs <- vector("list", length(site_ids))
+  
+  for (i in seq_along(site_ids)) {
+    
+    list_dfs[[i]] <- tryCatch(
+      get_os_site(auth_response, site_id = site_ids[i], ...),
+      error = function(e) {
+        cli::cli_alert_warning(paste0("Error in site id: ", site_ids[i], " ", e$message))
+        return(NULL)
+      }
+    )
+    
+    if (i %% 10 == 0) {
+      cli::cli_alert_success(
+        paste0("Retrieved ", i, " sites",
+               " out of ", length(site_ids))
+      )
+    }
+  }
+  
+  ## Combine the list of data.tables into a single data.table
+  dt_final = data.table::rbindlist(list_dfs, fill = TRUE)
+  
+  cli::cli_alert_success(paste0("Done: Site details retrieved"))
+  
+  return(dt_final)
+  
+}
+
+```
+
+```{r example-get_bulk_site_details}
+#get_bulk_site_details()
+```
+
+```{r tests-get_bulk_site_details}
+test_that("get_bulk_site_details works", {
+  expect_true(inherits(get_bulk_site_details, "function")) 
+})
+```
 
 
 ```{r development-inflate, eval=FALSE}

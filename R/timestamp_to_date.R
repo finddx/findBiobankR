@@ -72,9 +72,15 @@ timestamp_to_date.data.frame <- function(timestamp, date_cols = NULL){
   
   data.table::setDT(timestamp)
   
+  leng <- length(date_cols)
+  
+  if(leng != 0){
+    
+    timestamp[, (date_cols) := lapply(.SD, timestamp_to_date.numeric), .SDcols = date_cols]
+  }
   
   
-  timestamp[, (date_cols) := lapply(.SD, timestamp_to_date.numeric), .SDcols = date_cols]
+  
   
   
   

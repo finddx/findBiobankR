@@ -171,3 +171,21 @@ df
 #get_all_sites()
 ```
 
+# parse_site_details
+
+```{r example-parse_site_details}
+#parse_site_details()
+```
+
+# get_os_site
+
+```{r example-get_os_site}
+#get_os_site()
+```
+
+# get_bulk_site_details
+
+```{r example-get_bulk_site_details}
+#get_bulk_site_details()
+```
+

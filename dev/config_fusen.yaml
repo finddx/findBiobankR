@@ -49,16 +49,19 @@ OpenSpecimenAPI.Rmd:
   - R/get_bulk_order_items.R
   - R/get_bulk_orders.R
   - R/get_bulk_query.R
+  - R/get_bulk_site_details.R
   - R/get_order_detail.R
   - R/get_order_items.R
   - R/get_orders.R
   - R/get_os_query.R
+  - R/get_os_site.R
   - R/parse_all_sites.R
   - R/parse_data.R
   - R/parse_order_detail_data.R
   - R/parse_os_oder_list.R
   - R/parse_os_order_data.R
   - R/parse_os_response.R
+  - R/parse_site_details.R
   - R/timestamp_to_date.R
   tests:
   - tests/testthat/test-auth_os.R
@@ -77,6 +80,9 @@ OpenSpecimenAPI.Rmd:
   - tests/testthat/test-parse_all_sites.R
   - tests/testthat/test-get_bulk_order_items.R
   - tests/testthat/test-get_all_sites.R
+  - tests/testthat/test-parse_site_details.R
+  - tests/testthat/test-get_os_site.R
+  - tests/testthat/test-get_bulk_site_details.R
   vignettes: vignettes/open-specimen-api.Rmd
   inflate:
     flat_file: dev/OpenSpecimenAPI.Rmd
