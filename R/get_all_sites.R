@@ -8,14 +8,21 @@
 #'
 #' @param auth_response Authentication response object obtained from the OpenSpecimen API.
 #'
-#' @return A data table containing the details of all sites, or NULL if an error occurs.
+#' @param startAt Starting row of the result (optional).
+#' @param maxResults Maximum number of records to fetch (optional). By default, it will be 100.
+#' @param name Result contains all sites which have a name containing the given value (optional).
+#' @param exactMatch If TRUE, considers the name parameter as an exact match with the site name (optional).
+#' @param institute Result contains all sites which belong to the given institute (optional).
+#' @importFrom httr GET add_headers modify_url
+#' @return A data frame containing the details of all sites, or NULL if an error occurs.
+#'
 #'
 #' @seealso \code{\link{auth_os}}, \code{\link{parse_os_response}}, \code{\link{parse_all_sites}}
-#' @note [see api docs for more details:](https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/1115685/Get+All+Sites)
+#'
 #' @export
 #' @examples
 #' #get_all_sites()
-get_all_sites <- function(auth_response) {
+get_all_sites <- function(auth_response, startAt = NULL, maxResults = 500, name = NULL, exactMatch = FALSE, institute = NULL) {
   
   # URL to get all sites
   # For more details, refer to: https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/1115685/Get+All+Sites
@@ -26,6 +33,23 @@ get_all_sites <- function(auth_response) {
     "Content-Type" = "application/json",
     "X-OS-API-TOKEN" = auth_response$auth_response$token
   )
+  
+  # Construct query parameters based on provided arguments
+  query_params <- list(
+    startAt = startAt,
+    maxResults = maxResults,
+    name = name,
+    exactMatch = exactMatch,
+    institute = institute
+  )
+  
+  # Remove NULL parameters
+  query_params <- query_params[!sapply(query_params, is.null)]
+  
+  # Append query parameters to the URL
+  if (length(query_params) > 0) {
+    url <- modify_url(url, query = query_params)
+  }
   
   # Make the GET request for the query
   response <- GET(url = url, config = headers, encode = "json")
@@ -40,6 +64,7 @@ get_all_sites <- function(auth_response) {
     return(NULL)
   }
 }
+
 
 
 

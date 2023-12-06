@@ -4,21 +4,35 @@
 \alias{get_all_sites}
 \title{Get All Sites}
 \usage{
-get_all_sites(auth_response)
+get_all_sites(
+  auth_response,
+  startAt = NULL,
+  maxResults = 500,
+  name = NULL,
+  exactMatch = FALSE,
+  institute = NULL
+)
 }
 \arguments{
 \item{auth_response}{Authentication response object obtained from the OpenSpecimen API.}
+
+\item{startAt}{Starting row of the result (optional).}
+
+\item{maxResults}{Maximum number of records to fetch (optional). By default, it will be 100.}
+
+\item{name}{Result contains all sites which have a name containing the given value (optional).}
+
+\item{exactMatch}{If TRUE, considers the name parameter as an exact match with the site name (optional).}
+
+\item{institute}{Result contains all sites which belong to the given institute (optional).}
 }
 \value{
-A data table containing the details of all sites, or NULL if an error occurs.
+A data frame containing the details of all sites, or NULL if an error occurs.
 }
 \description{
 Use this function to retrieve all the sites in the OpenSpecimen application.
 The function sends an HTTP GET request to the OpenSpecimen server to fetch
 details of all the sites.
-}
-\note{
-\href{https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/1115685/Get+All+Sites}{see api docs for more details:}
 }
 \examples{
 #get_all_sites()
