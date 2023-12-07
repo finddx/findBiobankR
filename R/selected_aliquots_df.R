@@ -32,7 +32,7 @@
 #'                                      join_by_col = "ppid",
 #'                                      specimen_col ="specimen_type" ,
 #'                                      clinical_vars = clinical_cols ,
-#'                                       specimen_label_col = "specimen_label",
+#'                                      specimen_label_col = "specimen_label",
 #'                                      os_aliquot_names = c("Serum", "Plasma")
 #' )
 #'

@@ -67,6 +67,8 @@ knitr::kable(clin_specs[1:5, ])
 
 - Using the data set above select aliquot 
 
+
+
 ```{r}
 ##
 samples_list <- list(c("TB0990100010101001", "TB0990100010101002", "TB0990100010101003"),

@@ -33,7 +33,7 @@ clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
                                      join_by_col = "ppid",
                                      specimen_col ="specimen_type" ,
                                      clinical_vars = clinical_cols ,
-                                      specimen_label_col = "specimen_label",
+                                     specimen_label_col = "specimen_label",
                                      os_aliquot_names = c("Serum", "Plasma")
 )
 

@@ -105,11 +105,13 @@ sample_selections.Rmd:
   - R/samples_distributed_summary.R
   - R/select_many_aliquots.R
   - R/select_one_aliquot.R
+  - R/select_patients_per_group.R
   - R/selected_aliquots_df.R
   tests:
   - tests/testthat/test-convert_os_df_to_wide.R
   - tests/testthat/test-select_one_aliquot.R
   - tests/testthat/test-select_many_aliquots.R
+  - tests/testthat/test-select_patients_per_group.R
   - tests/testthat/test-selected_aliquots_df.R
   - tests/testthat/test-make_clean_os_names.R
   - tests/testthat/test-read_os_data.R

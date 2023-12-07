@@ -417,9 +417,7 @@ kable(oders_details[1:5])
 distributed_samples <- get_bulk_order_items(auth_response,
                                         orders_ids = orders$id )
 #> ✔ Retrieved 10 orders out of 36
-#> ! Error in order_id: 34 subscript out of bounds
 #> ✔ Retrieved 20 orders out of 36
-#> ! Error in order_id: 21 subscript out of bounds
 #> ✔ Retrieved 30 orders out of 36
 #> ✔ Done: orders retrieved
 

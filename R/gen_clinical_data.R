@@ -41,20 +41,21 @@
 #'                                          aliquot_cols = c("serum_aliquot","plasma_aliquot"),
 #'                                          ppid_col = "ppid")
 #'
+#' os_required_cols <- c("ppid",
+#'                       "Specimen_Specimen Label",
+#'                       "Specimen_Type",
+#'                       "Specimen_Requirement Name", 
+#'                       "Specimen_Barcode",
+#'                       "Specimen_Container Name", 
+#'                       "Specimen_Container Position",
+#'                       "Scanned_barcode")
 #' selected_samples_df <- process_save_selected_aliquots(file_path = NULL,
-#'                                save_file= FALSE,
-#'                                selected_samples = selected_samples,
-#'                                os_position = tb_specimen_df,
-#'                                ppid_col = "ppid",
-#'                                specimen_id_col = "specimen_label",
-#'                                os_required_cols = c("ppid",
-#'                                                     "Specimen_Specimen Label",
-#'                                                     "Specimen_Type",
-#'                                                     "Specimen_Requirement Name", 
-#'                                                     "Specimen_Barcode",
-#'                                                     "Specimen_Container Name", 
-#'                                                     "Specimen_Container Position",
-#'                                                     "Scanned_barcode"))
+#'                                                       save_file= FALSE,
+#'                                                       selected_samples = selected_samples,
+#'                                                       os_position = tb_specimen_df,
+#'                                                       ppid_col = "ppid",
+#'                                                       specimen_id_col = "specimen_label",
+#'                                                       os_required_cols = os_required_cols )
 #'
 #' gen_clinical_data(clinical_data = tb_data,
 #'                   clinical_cols= clinical_cols,
@@ -71,7 +72,9 @@ gen_clinical_data <- function(clinical_data,
                               selected_samples_df,
                               ppid_col,
                               dict_variable,
-                              specimen_cols = c("Participant_PPID", "Specimen_Barcode", "Specimen_Specimen Label"),
+                              specimen_cols = c("Participant_PPID",
+                                                "Specimen_Barcode", 
+                                                "Specimen_Specimen Label"),
                               additional_data = NULL ){
   
   setDT(clinical_data)
