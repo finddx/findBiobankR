@@ -2,7 +2,7 @@
 % Please edit documentation in R/get_orders.R
 \name{get_orders}
 \alias{get_orders}
-\title{Get OpenSpecimen Orders}
+\title{Get Orders}
 \usage{
 get_orders(
   auth_response,
@@ -12,23 +12,30 @@ get_orders(
 )
 }
 \arguments{
-\item{auth_response}{The authentication response obtained from \code{auth_os}.}
+\item{auth_response}{Authentication response object obtained from the OpenSpecimen API.}
 
-\item{include_stats}{Logical, whether to include statistics (default is TRUE).}
+\item{include_stats}{If TRUE, includes statistics in the response (optional, default is TRUE).}
 
-\item{start_at}{Integer, the starting position for pagination (optional).}
+\item{start_at}{Starting row of the result (optional).}
 
-\item{max_results}{Integer, the maximum number of results to retrieve (optional).}
+\item{max_results}{Maximum number of records to fetch (optional).}
 }
 \value{
-A data frame containing the parsed order data.
+A data frame containing the details of distribution orders, or NULL if an error occurs.
 }
 \description{
-This function retrieves a list of orders from the OpenSpecimen API using the provided authentication response and optional query parameters.   https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/259457077/Retrieve+list+of+Orders
-}
-\note{
-This function allows you to retrieve orders from OpenSpecimen and parse the response data into a data frame.   https://openspecimen.atlassian.net/wiki/spaces/CAT/pages/259457077/Retrieve+list+of+Orders
+Use this function to retrieve distribution orders in the OpenSpecimen application.
+The function sends an HTTP GET request to the OpenSpecimen server to fetch details of distribution orders.
 }
 \examples{
+\dontrun{
+# Example usage:
+auth_response <- authenticate_user(username = "your_username", password = "your_password")
+orders <- get_orders(auth_response)
+}
+
 #get_orders()
+}
+\seealso{
+\code{\link{auth_os}}, \code{\link{parse_os_response}}, \code{\link{parse_os_order_data}}
 }
