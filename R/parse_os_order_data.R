@@ -33,6 +33,7 @@ parse_os_order_data <- function(response, remove_personal_info = TRUE){
     # Remove personal information columns
     nms <- names(df)
     personal_info <- nms[grepl("email|phone|name$", nms)]
+    personal_info <- personal_info[!grepl("institute", personal_info)]
     df[, (personal_info) := NULL]
     
     
