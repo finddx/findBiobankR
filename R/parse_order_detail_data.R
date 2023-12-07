@@ -85,6 +85,7 @@ parse_order_detail_data <- function(response, remove_personal_info = TRUE) {
   if (isTRUE(remove_personal_info)) {
     
     personal_info <- nms[grepl("email|phone|name", nms)]
+    personal_info <- personal_info[!grepl("institute", personal_info)]
     dt_final[, (personal_info) := NULL]
   }
   
