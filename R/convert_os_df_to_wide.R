@@ -101,7 +101,7 @@ convert_os_df_to_wide <- function(clinical_df,
     
     aliquot_samples_df <- specimen_df[get(specimen_col) == aliq_name,
                                       list(NP_aliqN = .N,
-                                        NP_labels = list(get(specimen_label_col))),
+                                           NP_labels = list(get(specimen_label_col))),
                                       by = join_by_col]
     
     
@@ -131,7 +131,7 @@ convert_os_df_to_wide <- function(clinical_df,
     clinical_df = clinical_df[, .SD, 
                               .SDcols = clinical_vars]
   }
-   ## merge with clinical df
+  ## merge with clinical df
   final_df <- merge(clinical_df,
                     final_df,
                     by = join_by_col,

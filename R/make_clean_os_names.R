@@ -25,7 +25,7 @@ make_clean_os_names <- function(names_os_df){
   
   UseMethod("make_clean_os_names", names_os_df)
   
-  }
+}
 
 #' @export
 make_clean_os_names.default <- function(names_os_df){
@@ -42,25 +42,29 @@ make_clean_os_names.default <- function(names_os_df){
                       length = length(nms_break))
   
   
-  
-  for(i in 1:length(split_nms)){
+  if(length(split_nms) != 0){
     
-    this_s = split_nms[[i]] %>% unlist()
-    
-    if(length(this_s) < 2){
-      new_names[i] = this_s
-      next
-    }
-    tru_same = this_s[1] == this_s[2]
-    
-    if(tru_same& length(this_s) >= 2){
+    for(i in 1:length(split_nms)){
       
-      this_s = this_s[-1]
+      this_s = split_nms[[i]] %>% unlist()
+      
+      if(length(this_s) < 2){
+        new_names[i] = this_s
+        next
+      }
+      tru_same = this_s[1] == this_s[2]
+      
+      if(tru_same& length(this_s) >= 2){
+        
+        this_s = this_s[-1]
+      }
+      
+      this_s = paste0(this_s, collapse = "_")
+      new_names[i] = this_s
     }
     
-    this_s = paste0(this_s, collapse = "_")
-    new_names[i] = this_s
-  }
+  }else new_names = NULL
+  
   
   
   new_names
@@ -72,7 +76,13 @@ make_clean_os_names.default <- function(names_os_df){
 make_clean_os_names.data.frame <- function(names_os_df){
   
   nms = names(names_os_df)
-  nms_new = make_clean_os_names(nms)
-  setnames(names_os_df, nms, nms_new )
+  
+  if(length(nms) != 0 | is.null(nms)){
+    
+    nms_new = make_clean_os_names(nms)
+    setnames(names_os_df, nms, nms_new )
+    
+  } 
+  
 }
 

@@ -15,41 +15,34 @@ test_that("select_many_aliquots returns correct aliquots", {
   
   # Test case 1
   expected_result_1 <- list(
-   aliquots1 =  c("TB0990100010101001", "TB0990100020101001", 
-                  "TB0990100030101001", "TB0990100040101001", 
-                  "TB0990100050101001"),
+    aliquots1 =  c("TB0990100010101001", "TB0990100020101001", 
+                   "TB0990100030101001", "TB0990100040101001", 
+                   "TB0990100050101001"),
     aliquots2 = c("TB0990100010101002", "TB0990100020101002",
                   "TB0990100030101002", "TB0990100040101002",
                   "TB0990100050101002"),
-   
-   aliquots3 =  c("TB0990100010101003", "TB0990100020101003",
-                  "TB0990100030101003", "TB0990100040101003", 
-                  "TB0990100050101003"))
-   
-    result_1 <- select_many_aliquots(samples_list, 3)
-    expect_equal(result_1, expected_result_1)
     
-    # Test case 2
-    expected_result_2 <- list(
-      aliquots1 = c("TB0990100010101001", "TB0990100020101001", 
-                    "TB0990100030101001", "TB0990100040101001",
-                    "TB0990100050101001"
-))
-    result_2 <- select_many_aliquots(samples_list, 1)
-    
-    expect_equal(result_2, expected_result_2)
-    
-    
-    # Test case 3
-    expect_error(select_many_aliquots(samples_list, 0), 
-                 regxp = "Number of aliquots must be specified and greater than 0")
-})
+    aliquots3 =  c("TB0990100010101003", "TB0990100020101003",
+                   "TB0990100030101003", "TB0990100040101003", 
+                   "TB0990100050101003"))
+  
+  result_1 <- select_many_aliquots(samples_list, 3)
+  expect_equal(result_1, expected_result_1)
+  
+  # Test case 2
+  expected_result_2 <- list(
+    aliquots1 = c("TB0990100010101001", "TB0990100020101001", 
+                  "TB0990100030101001", "TB0990100040101001",
+                  "TB0990100050101001"
+    ))
+  result_2 <- select_many_aliquots(samples_list, 1)
+  
+  expect_equal(result_2, expected_result_2)
   
   
-
-
-test_that("select_patients_per_group works", {
-  expect_true(inherits(select_patients_per_group, "function")) 
+  # Test case 3
+  expect_error(select_many_aliquots(samples_list, 0), 
+               regxp = "Number of aliquots must be specified and greater than 0")
 })
 
 

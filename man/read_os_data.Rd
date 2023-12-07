@@ -21,6 +21,6 @@ A function to read Open Specimen data. The need comes from the fact that this fu
 }
 \examples{
 tb_specs <- system.file("extdata", "tb_specs.csv",
-                          package = "findBiobankR")
+                        package = "findBiobankR")
 read_os_data(path_name = tb_specs)
 }

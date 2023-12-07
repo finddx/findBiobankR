@@ -65,7 +65,7 @@ clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
                                      join_by_col = "ppid",
                                      specimen_col ="specimen_type" ,
                                      clinical_vars = clinical_cols ,
-                                      specimen_label_col = "specimen_label",
+                                     specimen_label_col = "specimen_label",
                                      os_aliquot_names = c("Serum", "Plasma")
 )
 
@@ -107,9 +107,7 @@ aliquots_selected <- select_many_aliquots(samples_list,
 aliquots_selected
 ```
 
-  
- # select_patients_per_group
-    
+# select_patients_per_group
 
 ```{r example-select_patients_per_group}
 
@@ -144,13 +142,7 @@ clin_specs_2 <- select_patients_per_group(df = clin_specs,
 
 ```
 
- 
-
 # selected_aliquots_df
-
-    
-
-  
 
 ```{r example-selected_aliquots_df}
 
@@ -167,7 +159,7 @@ clin_specs  <- convert_os_df_to_wide(clinical_df = tb_data,
                                      join_by_col = "ppid",
                                      specimen_col ="specimen_type" ,
                                      clinical_vars = clinical_cols ,
-                                      specimen_label_col = "specimen_label",
+                                     specimen_label_col = "specimen_label",
                                      os_aliquot_names = c("Serum", "Plasma")
 )
 
@@ -181,13 +173,7 @@ selected_aliquots_df(clin_specs,
                      ppid_col = "ppid")
 ```
 
-  
-
 # make_clean_os_names
-
-    
-
-  
 
 ```{r example-make_clean_os_names}
 
@@ -201,28 +187,15 @@ nms_os <- c("Participant_PPID", "Visit_Visit Site",
 make_clean_os_names(nms_os)
 ```
 
-  
-
 # read_os_data
-
-    
-
-  
 
 ```{r example-read_os_data}
 tb_specs <- system.file("extdata", "tb_specs.csv",
-                          package = "findBiobankR")
+                        package = "findBiobankR")
 read_os_data(path_name = tb_specs)
 ```
 
-  
-
-  
-  
-
 # append_check_col
-
-    
 
 ```{r example-append_check_col}
 
@@ -269,15 +242,7 @@ df_send <- append_check_col(selected_samples = selected_samples,
 df_send
 ```
 
-  
-  
-  
-
 # process_save_selected_aliquots
-
-    
-
-  
 
 ```{r example-process_save_selected_aliquots}
 
@@ -332,16 +297,7 @@ process_save_selected_aliquots(file_path = path_name,
 
 ```
 
-  
-
-  
-  
-
 # create_save_workbook
-
-    
-
-  
 
 ```{r example-create_save_workbook}
 
@@ -370,16 +326,7 @@ unlink(path_name)
 
 ```
 
-  
-
-  
-  
-
 # gen_clinical_data
-
-    
-
-  
 
 ```{r example-gen_clinical_data}
 library(data.table)
@@ -408,20 +355,21 @@ selected_samples <- selected_aliquots_df(clin_specs,
                                          aliquot_cols = c("serum_aliquot","plasma_aliquot"),
                                          ppid_col = "ppid")
 
+os_required_cols <- c("ppid",
+                      "Specimen_Specimen Label",
+                      "Specimen_Type",
+                      "Specimen_Requirement Name", 
+                      "Specimen_Barcode",
+                      "Specimen_Container Name", 
+                      "Specimen_Container Position",
+                      "Scanned_barcode")
 selected_samples_df <- process_save_selected_aliquots(file_path = NULL,
-                               save_file= FALSE,
-                               selected_samples = selected_samples,
-                               os_position = tb_specimen_df,
-                               ppid_col = "ppid",
-                               specimen_id_col = "specimen_label",
-                               os_required_cols = c("ppid",
-                                                    "Specimen_Specimen Label",
-                                                    "Specimen_Type",
-                                                    "Specimen_Requirement Name", 
-                                                    "Specimen_Barcode",
-                                                    "Specimen_Container Name", 
-                                                    "Specimen_Container Position",
-                                                    "Scanned_barcode"))
+                                                      save_file= FALSE,
+                                                      selected_samples = selected_samples,
+                                                      os_position = tb_specimen_df,
+                                                      ppid_col = "ppid",
+                                                      specimen_id_col = "specimen_label",
+                                                      os_required_cols = os_required_cols )
 
 gen_clinical_data(clinical_data = tb_data,
                   clinical_cols= clinical_cols,
@@ -434,13 +382,7 @@ gen_clinical_data(clinical_data = tb_data,
 
 ```
 
-  
-
 # samples_distributed_summary
-
-    
-
-  
 
 ```{r example-samples_distributed_summary}
 library(data.table)
@@ -469,50 +411,39 @@ selected_samples <- selected_aliquots_df(clin_specs,
                                          aliquot_cols = c("serum_aliquot","plasma_aliquot"),
                                          ppid_col = "ppid")
 
+os_required_cols <- c("ppid",
+                      "Specimen_Specimen Label",
+                      "Specimen_Type",
+                      "Specimen_Requirement Name", 
+                      "Specimen_Barcode",
+                      "Specimen_Container Name", 
+                      "Specimen_Container Position",
+                      "Scanned_barcode")
 selected_samples_df <- process_save_selected_aliquots(file_path = NULL,
-                               save_file= FALSE,
-                               selected_samples = selected_samples,
-                               os_position = tb_specimen_df,
-                               ppid_col = "ppid",
-                               specimen_id_col = "specimen_label",
-                               os_required_cols = c("ppid",
-                                                    "Specimen_Specimen Label",
-                                                    "Specimen_Type",
-                                                    "Specimen_Requirement Name", 
-                                                    "Specimen_Barcode",
-                                                    "Specimen_Container Name", 
-                                                    "Specimen_Container Position",
-                                                    "Scanned_barcode"))
+                                                      save_file= FALSE,
+                                                      selected_samples = selected_samples,
+                                                      os_position = tb_specimen_df,
+                                                      ppid_col = "ppid",
+                                                      specimen_id_col = "specimen_label",
+                                                      os_required_cols = os_required_cols)
 
 list_dfs <- gen_clinical_data(clinical_data = tb_data,
-                  clinical_cols= clinical_cols,
-                  dictionary = tb_dictionary,
-                  selected_samples_df = selected_samples_df,
-                  ppid_col = "ppid",
-                  dict_variable = "variable_name",
-                  specimen_cols = c("ppid", "Specimen_Specimen Label", "Specimen_Type"),
-                  additional_data = NULL )
+                              clinical_cols= clinical_cols,
+                              dictionary = tb_dictionary,
+                              selected_samples_df = selected_samples_df,
+                              ppid_col = "ppid",
+                              dict_variable = "variable_name",
+                              specimen_cols = c("ppid", 
+                                                "Specimen_Specimen Label",
+                                                "Specimen_Type"),
+                              additional_data = NULL )
 
 samples_distributed_summary(df =list_dfs$clinical_data ,
-         unique_by_col = "ppid",
-         wider_by_col =  "Specimen_Type",
-         group_by_col = "tb_group",
-         save_file = FALSE,
-         path_name = NULL,
-         order_col = "Total")
+                            unique_by_col = "ppid",
+                            wider_by_col =  "Specimen_Type",
+                            group_by_col = "tb_group",
+                            save_file = FALSE,
+                            path_name = NULL,
+                            order_col = "Total")
 ```
-
-  
-  
-
-  
-
-
-  
-  
-  
-  
-
-  
-  
 

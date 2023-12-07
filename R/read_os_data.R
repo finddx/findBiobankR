@@ -14,7 +14,7 @@
 #' @export
 #' @examples
 #' tb_specs <- system.file("extdata", "tb_specs.csv",
-#'                           package = "findBiobankR")
+#'                         package = "findBiobankR")
 #' read_os_data(path_name = tb_specs)
 read_os_data <- function(path_name,
                          header_true = FALSE,
