@@ -121,8 +121,9 @@ append_check_col <- function(selected_samples,
   
   
   os_selected <- os_selected[, ..nms_old_pos]
+  os_selected[is.na(specimen_barcode), specimen_barcode := ""]
   os_selected[, specimen_barcode := gsub("^0","", specimen_barcode) ]
-  os_selected[, specimen_barcode := paste0("0", specimen_barcode) ]
+  os_selected[grepl("^\\d", specimen_barcode), specimen_barcode := paste0("0", specimen_barcode) ]
   nms_f <- names(os_selected)
   
   barcode_id <- which(nms_f == "specimen_barcode")
@@ -136,7 +137,7 @@ append_check_col <- function(selected_samples,
   os_selected[, checked :=paste0("IF(", barcode_rows,"=",scanned_barcode_rows,",1", ", 0",")" ) ]
   
   
-  os_selected[, specimen_barcode := fifelse(specimen_barcode == "0", specimen_label,specimen_barcode ) ]
+  os_selected[, specimen_barcode := fifelse(specimen_barcode %in% c("0", "0NA", ""), specimen_label,specimen_barcode ) ]
   
   setnames(os_selected, nms_old_pos, os_required_cols)
   
