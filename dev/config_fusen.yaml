@@ -105,6 +105,7 @@ sample_selections.Rmd:
   - R/process_save_selected_aliquots.R
   - R/read_os_data.R
   - R/samples_distributed_summary.R
+  - R/select_and_shuffle_dt.R
   - R/select_many_aliquots.R
   - R/select_one_aliquot.R
   - R/select_patients_per_group.R
@@ -113,6 +114,7 @@ sample_selections.Rmd:
   - tests/testthat/test-convert_os_df_to_wide.R
   - tests/testthat/test-select_one_aliquot.R
   - tests/testthat/test-select_many_aliquots.R
+  - tests/testthat/test-select_and_shuffle_dt.R
   - tests/testthat/test-select_patients_per_group.R
   - tests/testthat/test-selected_aliquots_df.R
   - tests/testthat/test-make_clean_os_names.R

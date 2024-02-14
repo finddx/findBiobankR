@@ -7,6 +7,9 @@
 #' @param patient_groups A vector of patient group. This names should be categories in patient_group_col
 #' @param number_per_group A vector same length indicating how many patient to select per group 
 #' @param sort_cols column(s) names that should be used to sort your data frame. We prefer to select patients with higher of aliquots 
+#' @param shuffle logical. If TRUE, the data will be shuffled before selection. Default is FALSE
+#' @param number_of_aliquots_col The column name with number of aliquots per patient. Default is "number_of_aliquots"
+#' @param ... Additional arguments to be passed to  select_and_shuffle_dt function
 #' @importFrom data.table setDT rbindlist setorderv
 #' @return data.table 
 #' 
@@ -46,7 +49,11 @@ select_patients_per_group <- function(df,
                                       patient_group_col,
                                       patient_groups,
                                       number_per_group,
-                                      sort_cols
+                                      sort_cols,
+                                      number_of_aliquots_col = "number_of_aliquots",
+                                      shuffle= FALSE,
+                                      ...
+                                     
 ){
   # Check that the number_per_group vector is the same length as the patient_groups vector
   if (length(number_per_group) != length(patient_groups)) {
@@ -70,7 +77,9 @@ select_patients_per_group <- function(df,
       stop(stop_mess)
     }
     setorderv(df1,cols = sort_cols, order = -1L)
-    
+    if(shuffle){
+      df1 = select_and_shuffle_dt(df1, numeric_var =number_of_aliquots_col)
+    }
     df1 = df1[1:no_i]
     list_selected[[i]] = df1
     

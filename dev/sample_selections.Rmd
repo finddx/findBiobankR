@@ -410,6 +410,60 @@ test_that("select_many_aliquots returns correct aliquots", {
 
 ```
 
+# select_and_shuffle_dt
+    
+```{r function-select_and_shuffle_dt}
+#' Select and Shuffle Rows Based on a Numeric Threshold
+#'
+#' This function takes a data.table, a numeric variable name, and a threshold. 
+#' It separates the rows into those above and below the threshold. Rows above 
+#' the threshold are shuffled. The function then combines these shuffled rows 
+#' with the unshuffled rows below the threshold, maintaining the original order 
+#' where possible.
+#'
+#' @param dt A data.table object.
+#' @param numeric_var The name of the numeric variable to evaluate against the threshold.
+#'           This should be provided as a character string.
+#' @param threshold The numeric threshold to separate the rows.
+#'           Default is 5.
+#' @param seed An optional seed for reproducibility.
+#' @return A data.table with rows above the threshold shuffled and 
+#' @export
+select_and_shuffle_dt <- function(dt, numeric_var, threshold = 5, seed = 123) {
+    # Ensure dt is a data.table
+    setDT(dt)
+    
+    # Add row index to maintain original order where needed
+
+    # Split data based on threshold
+    dt_above <- dt[get(numeric_var) >= threshold, ]
+    dt_below <- dt[get(numeric_var) < threshold, ]
+    
+    # Shuffle the above threshold data table
+    if (nrow(dt_above) > 0) {
+        set.seed(seed) # For reproducibility, optional
+        dt_above <- dt_above[sample(.N), ]
+    }
+    
+    # Combine the shuffled above with the below threshold, maintaining group order
+    dt_result <- rbindlist(list(dt_above, dt_below), use.names = TRUE)
+    
+    
+    return(dt_result)
+}
+
+```
+  
+```{r example-select_and_shuffle_dt}
+#select_and_shuffle_dt()
+```
+  
+```{r tests-select_and_shuffle_dt}
+test_that("select_and_shuffle_dt works", {
+  expect_true(inherits(select_and_shuffle_dt, "function")) 
+})
+```
+  
 # select_patients_per_group
 
 ```{r function-select_patients_per_group}
@@ -420,6 +474,9 @@ test_that("select_many_aliquots returns correct aliquots", {
 #' @param patient_groups A vector of patient group. This names should be categories in patient_group_col
 #' @param number_per_group A vector same length indicating how many patient to select per group 
 #' @param sort_cols column(s) names that should be used to sort your data frame. We prefer to select patients with higher of aliquots 
+#' @param shuffle logical. If TRUE, the data will be shuffled before selection. Default is FALSE
+#' @param number_of_aliquots_col The column name with number of aliquots per patient. Default is "number_of_aliquots"
+#' @param ... Additional arguments to be passed to  select_and_shuffle_dt function
 #' @importFrom data.table setDT rbindlist setorderv
 #' @return data.table 
 #' 
@@ -428,7 +485,11 @@ select_patients_per_group <- function(df,
                                       patient_group_col,
                                       patient_groups,
                                       number_per_group,
-                                      sort_cols
+                                      sort_cols,
+                                      number_of_aliquots_col = "number_of_aliquots",
+                                      shuffle= FALSE,
+                                      ...
+                                     
 ){
   # Check that the number_per_group vector is the same length as the patient_groups vector
   if (length(number_per_group) != length(patient_groups)) {
@@ -452,7 +513,9 @@ select_patients_per_group <- function(df,
       stop(stop_mess)
     }
     setorderv(df1,cols = sort_cols, order = -1L)
-    
+    if(shuffle){
+      df1 = select_and_shuffle_dt(df1, numeric_var =number_of_aliquots_col)
+    }
     df1 = df1[1:no_i]
     list_selected[[i]] = df1
     

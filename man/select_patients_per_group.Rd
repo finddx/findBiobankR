@@ -10,7 +10,10 @@ select_patients_per_group(
   patient_group_col,
   patient_groups,
   number_per_group,
-  sort_cols
+  sort_cols,
+  number_of_aliquots_col = "number_of_aliquots",
+  shuffle = FALSE,
+  ...
 )
 }
 \arguments{
@@ -23,6 +26,12 @@ select_patients_per_group(
 \item{number_per_group}{A vector same length indicating how many patient to select per group}
 
 \item{sort_cols}{column(s) names that should be used to sort your data frame. We prefer to select patients with higher of aliquots}
+
+\item{number_of_aliquots_col}{The column name with number of aliquots per patient. Default is "number_of_aliquots"}
+
+\item{shuffle}{logical. If TRUE, the data will be shuffled before selection. Default is FALSE}
+
+\item{...}{Additional arguments to be passed to  select_and_shuffle_dt function}
 }
 \value{
 data.table
