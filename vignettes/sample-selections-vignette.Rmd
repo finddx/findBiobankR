@@ -107,6 +107,20 @@ aliquots_selected <- select_many_aliquots(samples_list,
 aliquots_selected
 ```
 
+# select_and_shuffle_dt
+
+    
+
+  
+
+```{r example-select_and_shuffle_dt}
+#select_and_shuffle_dt()
+```
+
+  
+
+  
+
 # select_patients_per_group
 
 ```{r example-select_patients_per_group}
