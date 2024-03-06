@@ -24,8 +24,8 @@ Imports:
     scales (>= 1.1.1),
     stringr (>= 1.4.0),
     tidyr (>= 1.2.0),
-    tools (>= 4.2.0),
-    utils (>= 4.2.0)
+    tools (>= 4.1.0),
+    utils (>= 4.1.0)
 Suggests: 
     dplyr (>= 1.1.0),
     knitr (>= 1.42),
