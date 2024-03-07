@@ -514,7 +514,7 @@ select_patients_per_group <- function(df,
     }
     setorderv(df1,cols = sort_cols, order = -1L)
     if(shuffle){
-      df1 = select_and_shuffle_dt(df1, numeric_var =number_of_aliquots_col)
+      df1 = select_and_shuffle_dt(df1, numeric_var =number_of_aliquots_col, ...)
     }
     df1 = df1[1:no_i]
     list_selected[[i]] = df1
