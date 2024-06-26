@@ -461,3 +461,20 @@ samples_distributed_summary(df =list_dfs$clinical_data ,
                             order_col = "Total")
 ```
 
+# mark_all_duplicates
+
+    
+
+  
+
+```{r example-mark_all_duplicates}
+
+vec <- c("apple", "banana", "apple", "cherry", "banana")
+mark_all_duplicates(vec)
+```
+
+  
+
+  
+
+

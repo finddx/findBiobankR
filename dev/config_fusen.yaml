@@ -102,6 +102,7 @@ sample_selections.Rmd:
   - R/create_save_workbook.R
   - R/gen_clinical_data.R
   - R/make_clean_os_names.R
+  - R/mark_all_duplicates.R
   - R/process_save_selected_aliquots.R
   - R/read_os_data.R
   - R/samples_distributed_summary.R
@@ -124,6 +125,7 @@ sample_selections.Rmd:
   - tests/testthat/test-create_save_workbook.R
   - tests/testthat/test-gen_clinical_data.R
   - tests/testthat/test-samples_distributed_summary.R
+  - tests/testthat/test-mark_all_duplicates.R
   vignettes: vignettes/sample-selections-vignette.Rmd
   inflate:
     flat_file: dev/sample_selections.Rmd

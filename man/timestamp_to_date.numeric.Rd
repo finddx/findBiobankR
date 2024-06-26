@@ -9,10 +9,10 @@
 \arguments{
 \item{timestamp}{Numeric timestamp.}
 
-\item{date_cols}{Names of the timestamp columns to convert if the object timestamp is a data.frame. This is not needed for this method}
+\item{date_cols}{Names of the timestamp columns to convert if the object timestamp is a data.frame.}
 }
 \value{
-doesn't return anything because the data frame is converted to data.table and function applied in place.
+A datetime object.
 }
 \description{
 This method converts a numeric timestamp to a datetime object.

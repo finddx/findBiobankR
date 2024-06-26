@@ -31,23 +31,31 @@ timestamp_to_date <- function(timestamp, date_cols = NULL){
   
 }
 
+
 #' Convert Numeric Timestamp to Date
 #'
 #' This method converts a numeric timestamp to a datetime object.
 #'
 #' @param timestamp Numeric timestamp.
-#' @param date_cols Names of the timestamp columns to convert if the object timestamp is a data.frame. This is not needed for this method
+#' @param date_cols Names of the timestamp columns to convert if the object timestamp is a data.frame.
 #'
-#' @return doesn't return anything because the data frame is converted to data.table and function applied in place.
+#' @return A datetime object.
 #'
 #' @export
+
+
 timestamp_to_date.numeric <- function(timestamp, date_cols = NULL){
+  if (!is.numeric(timestamp)) {
+    warning("Input timestamp is not numeric. Skipping conversion.")
+    return(timestamp)
+  }
   
   timestamp <- as.numeric(timestamp)
   timestamp <- timestamp/1000
   timestamp <- lubridate::as_datetime(timestamp)
   return(timestamp)
 }
+
 
 #' Convert Timestamp Columns in a Data Frame to Date
 #'
