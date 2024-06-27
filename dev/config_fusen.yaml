@@ -99,6 +99,7 @@ sample_selections.Rmd:
   R:
   - R/append_check_col.R
   - R/convert_os_df_to_wide.R
+  - R/create_folders.R
   - R/create_save_workbook.R
   - R/gen_clinical_data.R
   - R/make_clean_os_names.R
@@ -126,6 +127,7 @@ sample_selections.Rmd:
   - tests/testthat/test-gen_clinical_data.R
   - tests/testthat/test-samples_distributed_summary.R
   - tests/testthat/test-mark_all_duplicates.R
+  - tests/testthat/test-create_folders.R
   vignettes: vignettes/sample-selections-vignette.Rmd
   inflate:
     flat_file: dev/sample_selections.Rmd
