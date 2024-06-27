@@ -120,7 +120,7 @@ gen_clinical_data <- function(clinical_data,
       stop("ppid_col is not present in the additional data set")
     }
     clinical_data <- merge(additional_data,
-                           clinical_data, by = ppid_col, all.x = TRUE) 
+                           clinical_data, by = ppid_col, all.y = TRUE) 
     
     
   }else{

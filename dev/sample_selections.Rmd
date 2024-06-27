@@ -1256,7 +1256,7 @@ gen_clinical_data <- function(clinical_data,
       stop("ppid_col is not present in the additional data set")
     }
     clinical_data <- merge(additional_data,
-                           clinical_data, by = ppid_col, all.x = TRUE) 
+                           clinical_data, by = ppid_col, all.y = TRUE) 
     
     
   }else{
@@ -1534,6 +1534,77 @@ mark_all_duplicates(vec)
 test_that("mark_all_duplicates works", {
   expect_true(inherits(mark_all_duplicates, "function")) 
 })
+```
+  
+# create_folders
+    
+```{r function-create_folders}
+#' Create Project Folders
+#'
+#' This function creates a set of folders for a project, including a main folder and specified subfolders.
+#' It optionally assigns global variable names for each folder path, using a provided suffix.
+#'
+#' @param main_folder A string specifying the path of the main project folder.
+#' @param subfolders A character vector of subfolders to be created within the main folder.
+#'                   Default is c("data", "results", "doc").
+#' @param suffix A string to append to each subfolder name when creating global variables.
+#'               Default is "_folder".
+#' @importFrom stats  setNames
+#' @export
+create_folders <- function(main_folder, subfolders = c("data", "results", "doc"), suffix = "_folder") {
+  # Create a list of folder paths by appending each subfolder name to the main folder path
+  folders_to_create <- setNames(
+    lapply(subfolders, function(subfolder) paste0(main_folder, "/", subfolder)),
+    paste0(subfolders, suffix)
+  )
+  
+  # Add the main folder path to the list, without the suffix
+  folders_to_create$main_folder <- main_folder
+  
+  # Create each folder if it does not exist
+  for (folder_name in names(folders_to_create)) {
+    folder_path <- folders_to_create[[folder_name]]
+    if (!dir.exists(folder_path)) {
+      dir.create(folder_path, recursive = TRUE)
+      cat(sprintf("Created folder: %s\n", folder_path))
+    } else {
+      cat(sprintf("Folder already exists: %s\n", folder_path))
+    }
+    # Optionally, assign folder path to global environment
+    assign(folder_name, folder_path, envir = .GlobalEnv)
+  }
+}
+
+```
+  
+```{r example-create_folders}
+path_name <- tempfile(pattern = "main_folder") %>%
+    normalizePath(winslash = "/")
+
+create_folders(path_name)
+
+# Specify different subfolders and a custom suffix
+create_folders(path_name, c("archive", "temp", "shared"), "_dir")
+
+```
+  
+```{r tests-create_folders}
+# Test the function with custom subfolders and a custom suffix
+test_that("create_folders with custom subfolders and suffix", {
+  # Test setup: create a temporary path for testing
+  path_name <- tempfile(pattern = "main_folder") %>%
+    normalizePath(winslash = "/")
+
+  create_folders(path_name, c("archive", "temp", "shared"), "_dir")
+  expect_true(dir.exists(file.path(path_name, "archive")))
+  expect_true(dir.exists(file.path(path_name, "temp")))
+  expect_true(dir.exists(file.path(path_name, "shared")))
+  # Check if global variables are correctly assigned
+  expect_identical(get("archive_dir", envir = .GlobalEnv), file.path(path_name, "archive"))
+  expect_identical(get("temp_dir", envir = .GlobalEnv), file.path(path_name, "temp"))
+  expect_identical(get("shared_dir", envir = .GlobalEnv), file.path(path_name, "shared"))
+})
+
 ```
   
 

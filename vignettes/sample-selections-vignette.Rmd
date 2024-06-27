@@ -477,4 +477,25 @@ mark_all_duplicates(vec)
 
   
 
+# create_folders
+
+    
+
+  
+
+```{r example-create_folders}
+path_name <- tempfile(pattern = "main_folder") %>%
+    normalizePath(winslash = "/")
+
+create_folders(path_name)
+
+# Specify different subfolders and a custom suffix
+create_folders(path_name, c("archive", "temp", "shared"), "_dir")
+
+```
+
+  
+
+  
+
 
