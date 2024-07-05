@@ -4,7 +4,7 @@
 \alias{timestamp_to_date.data.frame}
 \title{Convert Timestamp Columns in a Data Frame to Date}
 \usage{
-\method{timestamp_to_date}{data.frame}(timestamp, date_cols = NULL)
+timestamp_to_date.data.frame(timestamp, date_cols = NULL)
 }
 \arguments{
 \item{timestamp}{Data frame with timestamp columns.}

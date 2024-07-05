@@ -7,23 +7,29 @@
 timestamp_to_date(timestamp, date_cols = NULL)
 }
 \arguments{
-\item{timestamp}{Numeric timestamp or a data frame with timestamp columns.}
+\item{timestamp}{A vector of timestamps which can be either numeric or character.}
 
-\item{date_cols}{Names of the timestamp columns to convert.}
+\item{date_cols}{(Optional) Columns to be treated as date columns. Currently not used.}
 }
 \value{
-A datetime object when a numeric timestamp is provided, or a modified data frame when a
-data frame with timestamp columns is provided.
+A vector with converted date-time objects or the original input if conversion is skipped.
 }
 \description{
-This function provides a generic method and methods for numeric and data frame objects to convert
-timestamps to date objects. It is especially useful for dealing with timestamps stored as numeric values.
+This function converts numeric timestamps (in milliseconds) to date-time objects.
+If the input contains special characters or is not numeric, it skips the conversion.
 }
 \examples{
 
-timestamp <- 1637892323000
-datetime <- timestamp_to_date(timestamp)
-datetime
+timestamps <- c("1625068800000", "1625068801000", "1625068802000")
+converted_timestamps <- timestamp_to_date(timestamps)
+converted_timestamps
+
+timestamps_numeric <- c(1625068800000, 1625068801000, 1625068802000)
+converted_timestamps_numeric <- timestamp_to_date(timestamps_numeric)
+converted_timestamps_numeric
+timestamps_with_specials <- c("1625068800000", "2021-07-01 00:00:00", "1625068800/1000")
+timestamps_with_specials <- c("1625068800000", "2021-07-01 00:00:00", "1625068800/1000")
+timestamps_with_specials
 # Example 2: Convert timestamp columns in a data frame
 df <- data.frame(id = c(1, 2, 3),
                  event_date = c(1637892323000, 1637892423000, 1637892523000))
