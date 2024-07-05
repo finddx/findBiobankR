@@ -102,43 +102,39 @@ test_that("auth_os works", {
 ```{r function-timestamp_to_date}
 #' Convert Timestamp to Date
 #'
-#' This function provides a generic method and methods for numeric and data frame objects to convert
-#' timestamps to date objects. It is especially useful for dealing with timestamps stored as numeric values.
+#' This function converts numeric timestamps (in milliseconds) to date-time objects. 
+#' If the input contains special characters or is not numeric, it skips the conversion.
 #'
-#' @param timestamp Numeric timestamp or a data frame with timestamp columns.
-#' @param date_cols  Names of the timestamp columns to convert.
-#' @return A datetime object when a numeric timestamp is provided, or a modified data frame when a
-#' data frame with timestamp columns is provided.
-#'
+#' @param timestamp A vector of timestamps which can be either numeric or character.
+#' @param date_cols (Optional) Columns to be treated as date columns. Currently not used.
+#' @return A vector with converted date-time objects or the original input if conversion is skipped.
+#' @importFrom lubridate as_datetime
 #' @export
-#' 
-timestamp_to_date <- function(timestamp, date_cols = NULL){
+timestamp_to_date <- function(timestamp, date_cols = NULL) {
+  # Helper function to detect special characters
+  has_special_characters <- function(input) {
+    grepl("[-/:]", input)
+  }
   
-  UseMethod("timestamp_to_date")
+  # Helper function to check if the whole vector is all digits
+  is_all_digits <- function(input) {
+    all(grepl("^\\d+$", input))
+  }
   
-}
-
-
-#' Convert Numeric Timestamp to Date
-#'
-#' This method converts a numeric timestamp to a datetime object.
-#'
-#' @param timestamp Numeric timestamp.
-#' @param date_cols Names of the timestamp columns to convert if the object timestamp is a data.frame.
-#'
-#' @return A datetime object.
-#'
-#' @export
-
-
-timestamp_to_date.numeric <- function(timestamp, date_cols = NULL){
-  if (!is.numeric(timestamp)) {
-    warning("Input timestamp is not numeric. Skipping conversion.")
+  # Check if input is a character vector and all elements are digits
+  if (is.character(timestamp) && is_all_digits(timestamp)) {
+    timestamp <- as.numeric(timestamp)
+  }
+  
+  # Check if input is numeric or has special characters
+  if (!is.numeric(timestamp) || any(sapply(timestamp, has_special_characters))) {
+    warning("Input timestamp is not numeric or contains special characters. Skipping conversion.")
     return(timestamp)
   }
   
+  # Perform the conversion
   timestamp <- as.numeric(timestamp)
-  timestamp <- timestamp/1000
+  timestamp <- timestamp / 1000
   timestamp <- lubridate::as_datetime(timestamp)
   return(timestamp)
 }
@@ -171,7 +167,7 @@ timestamp_to_date.data.frame <- function(timestamp, date_cols = NULL){
   
   if(leng != 0){
     
-    timestamp[, (date_cols) := lapply(.SD, timestamp_to_date.numeric), .SDcols = date_cols]
+    timestamp[, (date_cols) := lapply(.SD, timestamp_to_date), .SDcols = date_cols]
   }
   
   
@@ -188,9 +184,16 @@ timestamp_to_date.data.frame <- function(timestamp, date_cols = NULL){
 
 ```{r example-timestamp_to_date}
 
-timestamp <- 1637892323000
-datetime <- timestamp_to_date(timestamp)
-datetime
+timestamps <- c("1625068800000", "1625068801000", "1625068802000")
+converted_timestamps <- timestamp_to_date(timestamps)
+converted_timestamps
+
+timestamps_numeric <- c(1625068800000, 1625068801000, 1625068802000)
+converted_timestamps_numeric <- timestamp_to_date(timestamps_numeric)
+converted_timestamps_numeric
+timestamps_with_specials <- c("1625068800000", "2021-07-01 00:00:00", "1625068800/1000")
+timestamps_with_specials <- c("1625068800000", "2021-07-01 00:00:00", "1625068800/1000")
+timestamps_with_specials
 # Example 2: Convert timestamp columns in a data frame
 df <- data.frame(id = c(1, 2, 3),
                  event_date = c(1637892323000, 1637892423000, 1637892523000))
@@ -967,7 +970,7 @@ get_bulk_order_detail <- function(auth_response, orders_ids, ...) {
   dt_final = data.table::rbindlist(list_dfs, fill = TRUE)
   
   cli::cli_alert_success(paste0("All ", i, " orders retrieved"))
-  
+  timestamp_to_date.data.frame(dt_final)
   return(dt_final)
   
 }

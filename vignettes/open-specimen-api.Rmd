@@ -38,9 +38,16 @@ library(findBiobankR)
 
 ```{r example-timestamp_to_date}
 
-timestamp <- 1637892323000
-datetime <- timestamp_to_date(timestamp)
-datetime
+timestamps <- c("1625068800000", "1625068801000", "1625068802000")
+converted_timestamps <- timestamp_to_date(timestamps)
+converted_timestamps
+
+timestamps_numeric <- c(1625068800000, 1625068801000, 1625068802000)
+converted_timestamps_numeric <- timestamp_to_date(timestamps_numeric)
+converted_timestamps_numeric
+timestamps_with_specials <- c("1625068800000", "2021-07-01 00:00:00", "1625068800/1000")
+timestamps_with_specials <- c("1625068800000", "2021-07-01 00:00:00", "1625068800/1000")
+timestamps_with_specials
 # Example 2: Convert timestamp columns in a data frame
 df <- data.frame(id = c(1, 2, 3),
                  event_date = c(1637892323000, 1637892423000, 1637892523000))
