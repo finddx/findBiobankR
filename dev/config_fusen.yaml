@@ -46,6 +46,7 @@ OpenSpecimenAPI.Rmd:
   state: active
   R:
   - R/auth_os.R
+  - R/convert_timestamp.R
   - R/get_all_sites.R
   - R/get_bulk_order_detail.R
   - R/get_bulk_order_items.R
@@ -64,10 +65,9 @@ OpenSpecimenAPI.Rmd:
   - R/parse_os_order_data.R
   - R/parse_os_response.R
   - R/parse_site_details.R
-  - R/timestamp_to_date.R
   tests:
   - tests/testthat/test-auth_os.R
-  - tests/testthat/test-timestamp_to_date.R
+  - tests/testthat/test-convert_timestamp.R
   - tests/testthat/test-parse_os_response.R
   - tests/testthat/test-parse_data.R
   - tests/testthat/test-get_os_query.R
