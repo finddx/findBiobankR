@@ -6,7 +6,7 @@
 #'
 #' @param auth_response The authentication response obtained from `auth_os`.
 #' @param order_id The ID of the order to retrieve details for.
-#'
+#' @param return_numeric Logical, whether to return timestamps as numeric values (default is TRUE). This function is parsed to parse order detail function
 #' @return A data table containing the parsed order detail data.
 #'
 #' @importFrom httr GET status_code 
@@ -16,7 +16,7 @@
 #'
 #' # df = get_order_detail(auth_response, order_id = 392)
 #'
-get_order_detail <- function(auth_response, order_id) {
+get_order_detail <- function(auth_response, order_id, return_numeric = TRUE) {
   
   # Check if order_id is an integer
   if (isTRUE(round(order_id) != order_id)) {
@@ -45,7 +45,8 @@ get_order_detail <- function(auth_response, order_id) {
   
   
   results <- parse_os_response(response,
-                               parse_data_function = "parse_order_detail_data")
+                               parse_data_function = "parse_order_detail_data",
+                               return_numeric = return_numeric)
   
   if(inherits(results, "data.frame")) {
     

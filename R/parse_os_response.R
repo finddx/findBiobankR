@@ -7,7 +7,8 @@
 #'
 #' @param response The response object from the OpenSpecimen API request.
 #' @param parse_data_function The function used to parse the response data
-#'
+#' @param skip_date_convertion Skip date conversion
+#' @param ... Additional arguments to be passed to timestamp_to_date
 #' @return Parsed content from the API response.
 #'
 #' @importFrom httr status_code content
@@ -15,7 +16,7 @@
 #' @export
 #' @examples
 #' #parse_os_response()
-parse_os_response <- function(response, parse_data_function) {
+parse_os_response <- function(response, parse_data_function, skip_date_convertion = FALSE, ...) {
   
   
   
@@ -29,10 +30,11 @@ parse_os_response <- function(response, parse_data_function) {
     
     # if inherits data.frame apply timestamp_to_date
     
-    if(inherits(df, "data.frame")){
+    if(inherits(df, "data.frame") & !skip_date_convertion){
       
       
-      timestamp_to_date(df)
+     df =  timestamp_to_date(df, ...)
+     
     }
     
     return(df)

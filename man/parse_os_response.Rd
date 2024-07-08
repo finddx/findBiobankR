@@ -4,12 +4,21 @@
 \alias{parse_os_response}
 \title{OpenSpecimen API Request Response Handler}
 \usage{
-parse_os_response(response, parse_data_function)
+parse_os_response(
+  response,
+  parse_data_function,
+  skip_date_convertion = FALSE,
+  ...
+)
 }
 \arguments{
 \item{response}{The response object from the OpenSpecimen API request.}
 
 \item{parse_data_function}{The function used to parse the response data}
+
+\item{skip_date_convertion}{Skip date conversion}
+
+\item{...}{Additional arguments to be passed to timestamp_to_date}
 }
 \value{
 Parsed content from the API response.

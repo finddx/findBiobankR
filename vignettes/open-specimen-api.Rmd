@@ -49,13 +49,35 @@ timestamps_with_specials <- c("1625068800000", "2021-07-01 00:00:00", "162506880
 timestamps_with_specials <- c("1625068800000", "2021-07-01 00:00:00", "1625068800/1000")
 timestamps_with_specials
 # Example 2: Convert timestamp columns in a data frame
-df <- data.frame(id = c(1, 2, 3),
-                 event_date = c(1637892323000, 1637892423000, 1637892523000))
+df <- data.table::data.table(id = c(1, 2, 3),
+                 event_date_num = c(1637892323000, 1637892423000, 1637892523000),
+                 event_date_char = c("1637892323000", "1637892423000", "1637892523000")
+                 )
 
 
-timestamp_to_date(df)
+df = timestamp_to_date(df, return_numeric = FALSE)
 
 df
+
+
+date_time_strings <- c(
+  "2017-03-22 12:34:56", # ymd_HMS
+  "2017-03-22 12:34",    # ymd_HM
+  "2017-03-22 12",       # ymd_H
+  "2017-03-22",          # ymd
+  "22-03-2017 12:34:56", # dmy_HMS
+  "22-03-2017 12:34",    # dmy_HM
+  "22-03-2017 12",       # dmy_H
+  "22-03-2017",          # dmy
+  "03-22-2017 12:34:56", # mdy_HMS
+  "03-22-2017 12:34",    # mdy_HM
+  "03-22-2017 12",       # mdy_H
+  "03-22-2017"           # mdy
+)
+
+timestamp_to_date(date_time_strings)
+
+
 ```
 
 # parse_os_response

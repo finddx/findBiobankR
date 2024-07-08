@@ -47,7 +47,7 @@ get_bulk_order_detail <- function(auth_response, orders_ids, ...) {
   dt_final = data.table::rbindlist(list_dfs, fill = TRUE)
   
   cli::cli_alert_success(paste0("All ", i, " orders retrieved"))
-  timestamp_to_date.data.frame(dt_final)
+ # timestamp_to_date.data.frame(dt_final, return_numeric = TRUE)
   return(dt_final)
   
 }
