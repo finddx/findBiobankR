@@ -16,7 +16,7 @@
 #'
 #' # df = get_order_detail(auth_response, order_id = 392)
 #'
-get_order_detail <- function(auth_response, order_id, return_numeric = TRUE) {
+get_order_detail <- function(auth_response, order_id, return_numeric = F) {
   
   # Check if order_id is an integer
   if (isTRUE(round(order_id) != order_id)) {

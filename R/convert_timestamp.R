@@ -60,9 +60,7 @@ convert_timestamp <- function(x, return_numeric = FALSE) {
   }
   
   # Convert if x is in milliseconds
-  if (any(nchar(as.character(x)) > 10)) {
-    x <- x / 1000
-  }
+  x <- data.table::fifelse(nchar(as.character(x)) > 10, x / 1000, x)
   
   if (return_numeric) {
     return(x)

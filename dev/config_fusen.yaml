@@ -93,6 +93,7 @@ OpenSpecimenAPI.Rmd:
     check: true
     document: true
     overwrite: ask
+    clean: ask
 sample_selections.Rmd:
   path: dev/sample_selections.Rmd
   state: active

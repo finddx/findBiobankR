@@ -4,7 +4,7 @@
 \alias{get_order_detail}
 \title{Get OpenSpecimen Order Detail}
 \usage{
-get_order_detail(auth_response, order_id, return_numeric = TRUE)
+get_order_detail(auth_response, order_id, return_numeric = F)
 }
 \arguments{
 \item{auth_response}{The authentication response obtained from \code{auth_os}.}
