@@ -137,3 +137,4 @@ sample_selections.Rmd:
     check: true
     document: true
     overwrite: ask
+    clean: ask

@@ -1418,7 +1418,7 @@ samples_distributed_summary <- function(df,
       stop("please provide a path to save your file")
     }
     stopifnot("Directory provided does not exists"= dir.exists(dirname(path_name)))
-    utils::write.csv(dff, file = path_name)
+    utils::write.csv(dff, file = path_name, row.names = FALSE)
   }
   dff 
   
