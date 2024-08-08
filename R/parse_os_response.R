@@ -32,7 +32,7 @@ parse_os_response <- function(response, parse_data_function, skip_date_convertio
     
     if(inherits(df, "data.frame") & !skip_date_convertion){
       
-      
+     df = rm_all_na_col(df)
      df =  timestamp_to_date(df, ...)
      
     }
