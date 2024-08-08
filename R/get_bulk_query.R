@@ -68,7 +68,8 @@ get_bulk_query <- function(auth_response,
   
   # Remove  0 column DFs
   results_list <- results_list[sapply(results_list, function(x) !is.null(x))]
-  
+  #findBiobankR::rm_all_na_col
+  #results_list <- lapply(results_list, findBiobankR::rm_all_na_col)
   # Return the results as a single data frame
   df_results = data.table::rbindlist(results_list, fill = T) 
   
