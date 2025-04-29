@@ -138,3 +138,4 @@ sample_selections.Rmd:
     document: true
     overwrite: ask
     clean: ask
+    codecov: false
