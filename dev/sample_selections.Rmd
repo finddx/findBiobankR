@@ -477,52 +477,86 @@ test_that("select_and_shuffle_dt works", {
 #' @param shuffle logical. If TRUE, the data will be shuffled before selection. Default is FALSE
 #' @param number_of_aliquots_col The column name with number of aliquots per patient. Default is "number_of_aliquots"
 #' @param ... Additional arguments to be passed to  select_and_shuffle_dt function
-#' @importFrom data.table setDT rbindlist setorderv
+#' @importFrom data.table setDT rbindlist setorderv setcolorder
 #' @return data.table 
 #' 
 #' @export
+
 select_patients_per_group <- function(df, 
-                                      patient_group_col,
-                                      patient_groups,
-                                      number_per_group,
-                                      sort_cols,
-                                      number_of_aliquots_col = "number_of_aliquots",
-                                      shuffle= FALSE,
-                                      ...
-                                     
-){
-  # Check that the number_per_group vector is the same length as the patient_groups vector
+                                       patient_group_col,
+                                       patient_groups, 
+                                       number_per_group, 
+                                      sort_cols, 
+                                      number_of_aliquots_col = "number_of_aliquots", 
+                                      shuffle = FALSE, ...) {
+  # Check if number_per_group is a single value; if so, replicate it for all patient groups
+  if (length(number_per_group) == 1) {
+    number_per_group <- rep(number_per_group, length(patient_groups))
+  }
+  
+  # Ensure number_per_group has the same length as patient_groups after replication
   if (length(number_per_group) != length(patient_groups)) {
-    stop("The number_per_group vector is not the same length as the patient_groups vector")
+    stop("The number_per_group vector must either be a single value or match the length of patient_groups.")
   }
   
   setDT(df)
-  list_selected = vector(mode = "list", 
-                         length = length(patient_groups))
+  list_selected <- vector(mode = "list", length = length(patient_groups))
   
   for (i in seq_along(patient_groups)) {
+    patient_grp <- patient_groups[i]
+    no_i <- number_per_group[i]
+    df1 <- df[get(patient_group_col) == patient_grp]
     
-    patient_grp = patient_groups[i]
-    no_i = number_per_group[i]
-    df1 = df[get(patient_group_col)  ==patient_grp ]
-    if(isFALSE(nrow(df1) >= no_i)){
-      
-      stop_mess = glue::glue("Patient group {patient_grp} has insuficient number of participants for \\
-                          group, The number of participant required \\
-                          are {no_i}, the number available is {nrow(df1)}")
-      stop(stop_mess)
+    # If the requested number exceeds available rows, show warning and select all rows
+    if (nrow(df1) < no_i) {
+      warning(glue::glue("Patient group {patient_grp} has only {nrow(df1)} participants, which is less than the requested {no_i}. Selecting all available participants."))
+      no_i <- nrow(df1)
     }
-    setorderv(df1,cols = sort_cols, order = -1L)
-    if(shuffle){
-      df1 = select_and_shuffle_dt(df1, numeric_var =number_of_aliquots_col, ...)
-    }
-    df1 = df1[1:no_i]
-    list_selected[[i]] = df1
     
+    # Sort and shuffle if required
+    setorderv(df1, cols = sort_cols, order = -1L)
+    if (shuffle) {
+      df1 <- select_and_shuffle_dt(df1, numeric_var = number_of_aliquots_col, ...)
+    }
+    
+    # Select the required number of rows
+    df1 <- df1[1:no_i]
+    list_selected[[i]] <- df1
   }
-  df_final = rbindlist(list_selected)
+  
+  # Combine all selected rows into a single data.table
+  df_final <- rbindlist(list_selected)
   df_final
 }
+
+
+# Define the function
+move_columns <- function(df, cols_to_move, position = "last") {
+  # Ensure df is a data.table
+  setDT(df)
+  
+  # Get the current column names
+  all_cols <- colnames(df)
+  
+  # Ensure the specified columns exist in the data
+  cols_to_move <- intersect(cols_to_move, all_cols)
+  
+  # Remaining columns after removing the ones to move
+  remaining_cols <- setdiff(all_cols, cols_to_move)
+  
+  # Reorder columns based on the specified position
+  if (position == "first") {
+    new_order <- c(cols_to_move, remaining_cols)
+  } else {
+    new_order <- c(remaining_cols, cols_to_move)
+  }
+  
+  # Set the new column order
+  setcolorder(df, new_order)
+  
+  return(df)
+}
+
 ```
 
 

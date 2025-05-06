@@ -29,12 +29,12 @@ Imports:
     utils (>= 4.1.0)
 Suggests: 
     dplyr (>= 1.1.0),
-    knitr (>= 1.42),
+    knitr,
     rmarkdown (>= 2.20),
     testthat (>= 3.1.10)
 VignetteBuilder: 
     knitr
-Config/fusen/version: 0.6.0
+Config/fusen/version: 0.7.1
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
